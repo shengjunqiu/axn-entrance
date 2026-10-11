@@ -11,4 +11,10 @@ export default defineConfig({
       '@': path.resolve(import.meta.dirname, './src'),
     },
   },
+  server: {
+    // 监听所有网卡，方便通过 192.168.77.1:5173 调试
+    host: true,
+    port: 5173,
+    strictPort: true,
+  },
 })

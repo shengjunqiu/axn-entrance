@@ -12,7 +12,7 @@ function App() {
     <div className="flex min-h-svh flex-col bg-muted/30">
       <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col justify-center px-6 py-16 sm:py-24">
         <header className="flex flex-col items-center text-center">
-          <div className="flex size-12 items-center justify-center rounded-xl bg-foreground text-background">
+          <div className="flex size-12 items-center justify-center rounded-xl bg-primary text-primary-foreground">
             <Bot className="size-6" />
           </div>
           <h1 className="font-heading mt-6 text-3xl font-semibold tracking-tight sm:text-4xl">
