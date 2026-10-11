@@ -16,8 +16,10 @@ export function HomePage() {
       navigate('/phase-one')
       return
     }
-    // TODO: 移动端 的跳转目标待确认后在此实现
-    console.log('[entry]', entry.id)
+    if (entry.id === 'mobile') {
+      navigate('/mobile')
+      return
+    }
   }
 
   return (
