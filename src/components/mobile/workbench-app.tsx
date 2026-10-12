@@ -7,8 +7,9 @@ import { appSections, SCREEN_H, SCREEN_W } from '@/lib/mobile-data'
 /**
  * 手机内模拟页面：安小能「工作台」。
  * 尺寸写死为 428×926（与参考图 axn3.png @3x 一一对应），外层由 IphoneFrame 等比缩放。
+ * onOpenPreview：点带 previewUrl 的应用图标时，在手机屏幕内打开对应页面。
  */
-export function WorkbenchApp() {
+export function WorkbenchApp({ onOpenPreview }: { onOpenPreview: (url: string) => void }) {
   return (
     <div
       className="flex flex-col overflow-hidden bg-[#F1F3F4] select-none"
@@ -20,7 +21,7 @@ export function WorkbenchApp() {
       <div className="min-h-0 flex-1 overflow-y-auto px-[10px] pt-[10px] pb-[10px]">
         <WeatherCard />
         {appSections.map((section) => (
-          <AppSectionCard key={section.title} section={section} />
+          <AppSectionCard key={section.title} section={section} onOpenPreview={onOpenPreview} />
         ))}
       </div>
 

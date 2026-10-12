@@ -2,6 +2,7 @@ import {
   Archive,
   BookOpen,
   BookUser,
+  Bot,
   Boxes,
   CalendarDays,
   ClipboardList,
@@ -25,6 +26,10 @@ import {
 export const SCREEN_W = 428
 export const SCREEN_H = 926
 
+/** 安全区：状态栏高（参考图头部第一段），底部 Home 指示条区（页签栏 80 = 49 + 31 的安全区） */
+export const STATUS_BAR_H = 47
+export const HOME_INDICATOR_H = 31
+
 export type AppItem = {
   label: string
   /** 图标底色，逐像素采样自参考图 */
@@ -33,6 +38,8 @@ export type AppItem = {
   /** 用文字代替图标（如 AI、A） */
   text?: string
   badge?: number
+  /** 点击后在手机模拟器内打开的页面地址（iframe），无值则不可点 */
+  previewUrl?: string
 }
 
 export type AppSection = {
@@ -65,6 +72,8 @@ export const appSections: AppSection[] = [
       { label: '企业邮箱', color: '#007BFF', icon: Mail },
       { label: '会议日程-安能通', color: '#FFAD00', icon: CalendarDays },
       { label: '安全生产监管系统', color: '#1357EA', text: 'A' },
+      // 标注（vibe_1791773714406_pg01o976q）：新增「安小能」功能入口（参考图外的新增项）
+      { label: '安小能', color: '#347AFB', icon: Bot, previewUrl: 'https://axn-demo.pages.dev/' },
     ],
   },
   {

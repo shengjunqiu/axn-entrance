@@ -9,10 +9,12 @@
 | --- | --- |
 | `src/pages/mobile-page.tsx` | 页面：深蓝渐变背景 + 标题 + 手机 |
 | `src/components/mobile/iphone-frame.tsx` | iPhone 机身（边框、圆角、灵动岛、侧键），自适应缩放 |
+| `src/components/mobile/status-bar.tsx` | iOS 状态栏（时间/信号/4G/电量，47px），工作台头部与网页视图共用 |
 | `src/components/mobile/app-status-header.tsx` | 状态栏 + 导航条（工作台/设置/加号）+ 组织切换页签 |
 | `src/components/mobile/weather-card.tsx` | 顶部天气卡（渐变底 + 云 SVG） |
 | `src/components/mobile/app-section-card.tsx` | 分区卡片（办文 / 常用应用 / 公文）与图标块 |
 | `src/components/mobile/app-tab-bar.tsx` | 底部页签栏 |
+| `src/components/mobile/phone-browser.tsx` | 手机内嵌网页视图（状态栏 + 安全区内的 iframe + 右上角返回浮层 + Home 指示条） |
 | `src/components/mobile/workbench-app.tsx` | 手机内页面的组合 |
 | `src/lib/mobile-data.ts` | 尺寸常量、菜单数据、图标、页签数据（照原图逐字抄录） |
 | `src/lib/use-fit-scale.ts` | `useFitScale`：按容器尺寸算缩放比，手机不放大（`maxScale = 1`） |
@@ -52,6 +54,16 @@
 3. 原图有一层平铺水印（真人姓名 + 手机号），**未复现**（不属于 UI，且含真实个人信息）
 4. 手机内页面保持在 `scrollTop = 0`（原图状态），所以第三个分区「公文」只露出标题；
    该节在参考图中看不到，自行补了 3 项
+5. 「常用应用」末尾的「安小能」（`#347AFB` + Bot 图标）为本次演示新增的功能入口，参考图中没有；
+   追加在最后一位，不影响原有 12 个图标的行列位置。它是唯一可点的图标：点击后手机屏幕内
+   切到 `https://axn-demo.pages.dev/`（`phone-browser.tsx`），返回入口是网页右上角的浮层按钮
+   「‹ 返回工作台」（白底胶囊 + 阴影）。放右上角是因为页面自己的按钮都在左上角（汉堡），
+   做浮层而不做导航条是为了不占网页高度。
+   数据侧用 `AppItem.previewUrl` 控制，谁要加就在 `mobile-data.ts` 里补一个
+6. 内嵌网页的**安全区**：iframe 里 `env(safe-area-inset-*)` 恒为 0（跨域页面也没办法自己避让），
+   所以给它的是几何上的安全视口 —— 只占 `428×(926-47-31)`（47 状态栏 / 31 指示条区），
+   上面画状态栏、下面画 Home 指示条，
+   页面内容因此不会压在灵动岛或指示条上（与真机上没开 `viewport-fit=cover` 的网页一致）
 
 ## 怎么验证（可复用）
 

@@ -1,11 +1,11 @@
 import { ChevronUp } from 'lucide-react'
 import type { AppItem, AppSection } from '@/lib/mobile-data'
 
-function AppTile({ item }: { item: AppItem }) {
+function AppTile({ item, onOpenPreview }: { item: AppItem; onOpenPreview: (url: string) => void }) {
   const Icon = item.icon
 
-  return (
-    <div className="flex flex-col items-center">
+  const body = (
+    <>
       <div className="relative">
         <div
           className="flex size-[45.3px] items-center justify-center rounded-[12px] text-white"
@@ -32,12 +32,35 @@ function AppTile({ item }: { item: AppItem }) {
       <span className="mt-[7px] w-[70px] text-center text-[13px] leading-[16px] text-[#212121]">
         {item.label}
       </span>
-    </div>
+    </>
   )
+
+  // 有 previewUrl 的入口渲染成 <button>，点击后在手机屏幕内打开该页面（见 phone-browser.tsx）；
+  // 样式类与普通图标块保持一致，保证网格布局不变
+  if (item.previewUrl) {
+    const url = item.previewUrl
+    return (
+      <button
+        type="button"
+        onClick={() => onOpenPreview(url)}
+        className="flex cursor-pointer flex-col items-center p-0"
+      >
+        {body}
+      </button>
+    )
+  }
+
+  return <div className="flex flex-col items-center">{body}</div>
 }
 
 /** 首页分区卡片：标题 + 5 列应用网格（参考图里卡片与屏幕等宽内边距 10，网格铺满卡片） */
-export function AppSectionCard({ section }: { section: AppSection }) {
+export function AppSectionCard({
+  section,
+  onOpenPreview,
+}: {
+  section: AppSection
+  onOpenPreview: (url: string) => void
+}) {
   return (
     <section className="mt-[7px] rounded-[18px] bg-white pb-[17px]">
       <header className="flex h-[60px] items-center justify-between px-[16px]">
@@ -47,7 +70,7 @@ export function AppSectionCard({ section }: { section: AppSection }) {
 
       <div className="grid grid-cols-5 gap-y-[17px] pt-[4px]">
         {section.items.map((item) => (
-          <AppTile key={item.label + item.color} item={item} />
+          <AppTile key={item.label + item.color} item={item} onOpenPreview={onOpenPreview} />
         ))}
       </div>
     </section>
