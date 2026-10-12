@@ -14,9 +14,10 @@ const rowStyle = {
 
 /** 桌面门户集成入口：与参考图 axn.png 一致的整屏门户页 */
 export function PortalPage() {
+  // 带 href 的入口（安小能）由 PortalCard 直接渲染成 <a> 跳转，不会走到这里
   const handleEnter = (entry: PortalEntry) => {
-    // TODO: 各入口的跳转目标待确认后在此实现
-    console.log('[portal entry]', entry.id)
+    // TODO: 其余入口的跳转目标待确认后在此实现
+    void entry.id
   }
 
   return (

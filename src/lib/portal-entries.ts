@@ -12,6 +12,11 @@ export type PortalEntry = {
   title: string
   icon: LucideIcon
   /**
+   * 点击后的跳转地址（可选）。填写后点卡片就会跳到该地址，
+   * 留空则在 portal-page.tsx 的 handleEnter 里走待定的分支。
+   */
+  href?: string
+  /**
    * 卡片背景图（可选）。把图片放到 src/assets/ 后在这里引用，例如：
    *   import businessShot from '@/assets/portal-business.jpg'
    *   image: businessShot
@@ -30,5 +35,6 @@ export const portalEntries: PortalEntry[] = [
   { id: 'coordination', title: '综合协调保障系统', icon: Laptop },
   { id: 'decision-map', title: '辅助决策一张图', icon: Send },
   { id: 'mobile-app', title: '移动应用子系统', icon: ShieldUser },
-  { id: 'an-xiaoneng', title: '安小能', icon: Bot },
+  // 标注（vibe_1791766663815_wzsqskq61）：点击安小能卡片跳转到真实演示站点
+  { id: 'an-xiaoneng', title: '安小能', icon: Bot, href: 'https://axn-demo.pages.dev/' },
 ]
