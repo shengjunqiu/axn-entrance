@@ -22,6 +22,8 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 
+import { AXN_DEMO_URL } from '@/lib/demo-links'
+
 /** 手机屏幕逻辑尺寸（CSS px）。参考图 axn3.png 为 1284×2778，即 428×926 @3x，此处 1:1 对应 */
 export const SCREEN_W = 428
 export const SCREEN_H = 926
@@ -73,7 +75,7 @@ export const appSections: AppSection[] = [
       { label: '会议日程-安能通', color: '#FFAD00', icon: CalendarDays },
       { label: '安全生产监管系统', color: '#1357EA', text: 'A' },
       // 标注（vibe_1791773714406_pg01o976q）：新增「安小能」功能入口（参考图外的新增项）
-      { label: '安小能', color: '#347AFB', icon: Bot, previewUrl: 'https://axn-demo.pages.dev/' },
+      { label: '安小能', color: '#347AFB', icon: Bot, previewUrl: AXN_DEMO_URL },
     ],
   },
   {

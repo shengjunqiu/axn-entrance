@@ -1,5 +1,7 @@
 import { Bot, Box, Laptop, Send, ShieldUser, type LucideIcon } from 'lucide-react'
 
+import { AXN_DEMO_URL } from '@/lib/demo-links'
+
 export type PortalEntryId =
   | 'business'
   | 'coordination'
@@ -36,5 +38,5 @@ export const portalEntries: PortalEntry[] = [
   { id: 'decision-map', title: '辅助决策一张图', icon: Send },
   { id: 'mobile-app', title: '移动应用子系统', icon: ShieldUser },
   // 标注（vibe_1791766663815_wzsqskq61）：点击安小能卡片跳转到真实演示站点
-  { id: 'an-xiaoneng', title: '安小能', icon: Bot, href: 'https://axn-demo.pages.dev/' },
+  { id: 'an-xiaoneng', title: '安小能', icon: Bot, href: AXN_DEMO_URL },
 ]

@@ -1,4 +1,5 @@
 import { AppSidebar } from '@/components/phase-one/app-sidebar'
+import { AssistantWidget } from '@/components/phase-one/assistant-widget'
 import { AppTabBar } from '@/components/phase-one/app-tab-bar'
 import { AppTopNav } from '@/components/phase-one/app-top-nav'
 import { IncidentList } from '@/components/phase-one/incident-list'
@@ -20,6 +21,8 @@ export function PhaseOnePage() {
           <IncidentList />
         </main>
       </div>
+
+      <AssistantWidget />
     </div>
   )
 }
