@@ -3,16 +3,14 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 
 import { AXN_DEMO_URL } from '@/lib/demo-links'
 
-/** 悬浮球：直径 56 的圆 + 一行名称 */
-const BALL_DIAMETER = 56
-const BALL_GAP = 6
-const BALL_LABEL_H = 14
-/** 首帧还没量到真实尺寸时的兜底（圆 56 与「安小能」三字取宽者） */
-const BALL_BOX_FALLBACK = { w: 56, h: BALL_DIAMETER + BALL_GAP + BALL_LABEL_H }
+/** 悬浮球：直径 72 的圆，机器人头像 + 名称都放在圆里 */
+const BALL_DIAMETER = 72
+/** 首帧还没量到真实尺寸时的兜底 */
+const BALL_BOX_FALLBACK = { w: BALL_DIAMETER, h: BALL_DIAMETER }
 
-/** 浮窗内容宽固定 428（iPhone 逻辑宽度），演示站据此走移动版布局 */
-const PREVIEW_W = 428
-const PREVIEW_MAX_H = 680
+/** 浮窗内容宽固定 480，窄于桌面断点，演示站仍走移动版布局 */
+const PREVIEW_W = 480
+const PREVIEW_MAX_H = 760
 const PREVIEW_MIN_H = 240
 const PANEL_HEADER_H = 44
 /** 浮窗总宽 = 内容宽 + 左右各 1px 边框 */
@@ -42,7 +40,7 @@ function panelLeft(ball: Point, ballW: number, viewportW: number) {
 
 /**
  * 一期系统里的「安小能」悬浮入口：右下角一个可拖拽的圆形悬浮球（机器人头像 + 名称），
- * 点击展开浮窗，浮窗里用 iframe 加载演示站，宽度固定 428px 让演示站走移动版布局。
+ * 点击展开浮窗，浮窗里用 iframe 加载演示站，宽度固定 480px（窄于桌面断点）让演示站走移动版布局。
  * 悬浮球始终被夹在视口内，窗口尺寸变化时也会重新夹一次。收起方式：点悬浮球、点关闭、
  * 点浮窗外部、按 Esc。
  */
@@ -155,7 +153,7 @@ export function AssistantWidget() {
         aria-label={open ? '收起安小能' : '打开安小能'}
         aria-expanded={open}
         aria-haspopup="dialog"
-        className="group fixed z-50 flex w-max cursor-grab touch-none flex-col items-center gap-[6px] select-none active:cursor-grabbing"
+        className="group fixed z-50 flex cursor-grab touch-none select-none active:cursor-grabbing"
         style={{ left: ball?.x ?? -9999, top: ball?.y ?? -9999 }}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
@@ -168,11 +166,9 @@ export function AssistantWidget() {
           if (e.detail === 0) setOpen((prev) => !prev)
         }}
       >
-        <span className="flex size-[56px] items-center justify-center rounded-full border border-[#2E6FE0]/40 bg-[radial-gradient(120%_120%_at_30%_15%,#7BB0FF_0%,#347AFB_55%,#1D5CD8_100%)] text-white shadow-[0_10px_24px_-6px_rgba(29,92,216,0.65)] transition-transform duration-150 group-hover:scale-[1.04] group-active:scale-95">
-          <Bot className="size-[30px]" strokeWidth={1.9} />
-        </span>
-        <span className="text-[12px] leading-none font-medium text-[#1F2937] [text-shadow:0_1px_3px_rgba(255,255,255,0.95),0_0_7px_rgba(255,255,255,0.9)]">
-          安小能
+        <span className="flex size-[72px] flex-col items-center justify-center gap-[3px] rounded-full border border-[#2E6FE0]/40 bg-[radial-gradient(120%_120%_at_30%_15%,#7BB0FF_0%,#347AFB_55%,#1D5CD8_100%)] text-white shadow-[0_10px_24px_-6px_rgba(29,92,216,0.65)] transition-transform duration-150 group-hover:scale-[1.04] group-active:scale-95">
+          <Bot className="size-[24px]" strokeWidth={1.9} />
+          <span className="text-[13px] leading-none font-medium tracking-[0.5px]">安小能</span>
         </span>
       </button>
 
