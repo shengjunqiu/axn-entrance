@@ -10,7 +10,7 @@ import { AXN_DEMO_URL } from '@/lib/demo-links'
  */
 
 /** 首帧还没量到真实尺寸时的兜底（与 h-[120px] + 资源比例 + 标签一致） */
-const FIGURE_BOX_FALLBACK = { w: 91, h: 145 }
+const FIGURE_BOX_FALLBACK = { w: 91, h: 146 }
 
 /** 浮窗内容宽固定 480，窄于桌面断点，演示站仍走移动版布局 */
 const PREVIEW_W = 480
@@ -185,7 +185,7 @@ export function AssistantWidget() {
             onLoad={measure}
             className="pointer-events-none h-[120px] w-auto object-contain drop-shadow-[0_12px_18px_rgba(12,40,90,0.3)]"
           />
-          <span className="mt-[4px] rounded-full border border-[#D8DEE9] bg-white/95 px-[8px] py-[2px] text-[12px] leading-none font-medium text-[#1D5CD8] shadow-[0_2px_6px_rgba(23,42,84,0.14)]">
+          <span className="mt-[4px] rounded-full border border-[#D8DEE9] bg-white/95 px-[10px] py-[3px] text-[14px] leading-none font-medium text-[#1D5CD8] shadow-[0_2px_6px_rgba(23,42,84,0.14)]">
             安小能
           </span>
         </span>
