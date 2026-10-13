@@ -53,7 +53,7 @@
 ## 跳转接线
 
 - 首页「桌面门户集成入口」→ `/portal`
-- 首页「一期系统集成入口」→ `/phase-one`
+- 首页「综合平台集成入口」→ `/phase-one`
 - 首页「移动端集成入口」→ 待定（目前只 `console.log`）
 
 ## 安小能悬浮球（`src/components/phase-one/assistant-widget.tsx`）

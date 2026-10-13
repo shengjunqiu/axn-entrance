@@ -20,11 +20,12 @@ export const entries: Entry[] = [
     tags: ['PC', '单点登录'],
   },
   {
+    // 标注（vibe_1791857561371_652axtoxx）：卡片文案「一期系统」改为「综合平台」
     id: 'phase-one',
-    title: '一期系统集成入口',
-    description: '对接一期系统既有页面，保持原有操作习惯，能力无缝衔接。',
+    title: '综合平台集成入口',
+    description: '对接综合平台既有页面，保持原有操作习惯，能力无缝衔接。',
     icon: SquareStack,
-    tags: ['一期系统', '既有页面'],
+    tags: ['综合平台', '既有页面'],
   },
   {
     id: 'mobile',
