@@ -6,11 +6,11 @@ import { AXN_DEMO_URL } from '@/lib/demo-links'
 
 /**
  * 安小能数字人形象：从品牌 VIS 图里抠出的正视图全身（背景透明），直接当悬浮入口用。
- * 展示高度 96，宽度按图片比例自适应（资源 290×384，比例约 0.755）。
+ * 展示高度 120，宽度按图片比例自适应（资源 290×384，比例约 0.755），下方再挂一个名字小标签。
  */
 
-/** 首帧还没量到真实尺寸时的兜底（与 h-[96px] + 资源比例一致） */
-const FIGURE_BOX_FALLBACK = { w: 72, h: 96 }
+/** 首帧还没量到真实尺寸时的兜底（与 h-[120px] + 资源比例 + 标签一致） */
+const FIGURE_BOX_FALLBACK = { w: 91, h: 145 }
 
 /** 浮窗内容宽固定 480，窄于桌面断点，演示站仍走移动版布局 */
 const PREVIEW_W = 480
@@ -177,13 +177,18 @@ export function AssistantWidget() {
           if (e.detail === 0) setOpen((prev) => !prev)
         }}
       >
-        <img
-          src={figureUrl}
-          alt=""
-          draggable={false}
-          onLoad={measure}
-          className="pointer-events-none h-[96px] w-auto object-contain drop-shadow-[0_10px_16px_rgba(12,40,90,0.3)] transition-transform duration-150 group-hover:scale-[1.04] group-active:scale-95"
-        />
+        <span className="flex flex-col items-center transition-transform duration-150 group-hover:scale-[1.04] group-active:scale-95">
+          <img
+            src={figureUrl}
+            alt=""
+            draggable={false}
+            onLoad={measure}
+            className="pointer-events-none h-[120px] w-auto object-contain drop-shadow-[0_12px_18px_rgba(12,40,90,0.3)]"
+          />
+          <span className="mt-[4px] rounded-full border border-[#D8DEE9] bg-white/95 px-[8px] py-[2px] text-[12px] leading-none font-medium text-[#1D5CD8] shadow-[0_2px_6px_rgba(23,42,84,0.14)]">
+            安小能
+          </span>
+        </span>
       </button>
 
       {open && panelPos && (
