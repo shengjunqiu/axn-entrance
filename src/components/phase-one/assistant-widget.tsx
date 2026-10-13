@@ -1,12 +1,16 @@
 import { Bot, X } from 'lucide-react'
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 
+import figureUrl from '@/assets/an-xiaoneng-figure.png'
 import { AXN_DEMO_URL } from '@/lib/demo-links'
 
-/** 悬浮球：直径 72 的圆，机器人头像 + 名称都放在圆里 */
-const BALL_DIAMETER = 72
-/** 首帧还没量到真实尺寸时的兜底 */
-const BALL_BOX_FALLBACK = { w: BALL_DIAMETER, h: BALL_DIAMETER }
+/**
+ * 安小能数字人形象：从品牌 VIS 图里抠出的正视图全身（背景透明），直接当悬浮入口用。
+ * 展示高度 96，宽度按图片比例自适应（资源 290×384，比例约 0.755）。
+ */
+
+/** 首帧还没量到真实尺寸时的兜底（与 h-[96px] + 资源比例一致） */
+const FIGURE_BOX_FALLBACK = { w: 72, h: 96 }
 
 /** 浮窗内容宽固定 480，窄于桌面断点，演示站仍走移动版布局 */
 const PREVIEW_W = 480
@@ -16,9 +20,9 @@ const PANEL_HEADER_H = 44
 /** 浮窗总宽 = 内容宽 + 左右各 1px 边框 */
 const PANEL_W = PREVIEW_W + 2
 
-/** 浮窗与悬浮球之间的间距 */
+/** 浮窗与数字人之间的间距 */
 const GAP = 12
-/** 悬浮球拖拽后可贴到的最小边距 */
+/** 数字人拖拽后可贴到的最小边距 */
 const EDGE = 16
 /** 初始停在右下角时的边距 */
 const REST = 24
@@ -29,57 +33,62 @@ type Point = { x: number; y: number }
 
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max)
 
-/** 浮窗优先摊在悬浮球左侧；左边放不下（球被拖到左侧）就翻到右边，最后夹回视口内 */
-function panelLeft(ball: Point, ballW: number, viewportW: number) {
-  const leftOfBall = ball.x - PANEL_W - GAP
-  if (leftOfBall >= EDGE) return leftOfBall
-  const rightOfBall = ball.x + ballW + GAP
-  if (rightOfBall + PANEL_W <= viewportW - EDGE) return rightOfBall
-  return clamp(leftOfBall, EDGE, Math.max(EDGE, viewportW - PANEL_W - EDGE))
+/** 浮窗优先摊在数字人左侧；左边放不下（人拖到左侧）就翻到右边，最后夹回视口内 */
+function panelLeft(figure: Point, figureW: number, viewportW: number) {
+  const leftOfFigure = figure.x - PANEL_W - GAP
+  if (leftOfFigure >= EDGE) return leftOfFigure
+  const rightOfFigure = figure.x + figureW + GAP
+  if (rightOfFigure + PANEL_W <= viewportW - EDGE) return rightOfFigure
+  return clamp(leftOfFigure, EDGE, Math.max(EDGE, viewportW - PANEL_W - EDGE))
 }
 
 /**
- * 一期系统里的「安小能」悬浮入口：右下角一个可拖拽的圆形悬浮球（机器人头像 + 名称），
- * 点击展开浮窗，浮窗里用 iframe 加载演示站，宽度固定 480px（窄于桌面断点）让演示站走移动版布局。
- * 悬浮球始终被夹在视口内，窗口尺寸变化时也会重新夹一次。收起方式：点悬浮球、点关闭、
+ * 一期系统里的「安小能」悬浮入口：右下角悬浮一整只数字人（品牌 VIS 里的正视图，背景透明），
+ * 可拖拽。点击展开浮窗，浮窗里用 iframe 加载演示站，宽度固定 480px（窄于桌面断点）让演示站走移动版布局。
+ * 数字人始终被夹在视口内，窗口尺寸变化时也会重新夹一次。收起方式：点数字人、点关闭、
  * 点浮窗外部、按 Esc。
  */
 export function AssistantWidget() {
   const [viewport, setViewport] = useState(() => ({ w: window.innerWidth, h: window.innerHeight }))
-  const [ballBox, setBallBox] = useState(BALL_BOX_FALLBACK)
+  const [figureBox, setFigureBox] = useState(FIGURE_BOX_FALLBACK)
   /** null 表示还没定位，先渲染到视口外，避免闪一下左上角 */
-  const [ball, setBall] = useState<Point | null>(null)
+  const [figure, setFigure] = useState<Point | null>(null)
   const [open, setOpen] = useState(false)
-  const ballRef = useRef<HTMLButtonElement>(null)
+  const figureRef = useRef<HTMLButtonElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
   const dragRef = useRef<{ dx: number; dy: number; startX: number; startY: number; moved: boolean } | null>(null)
   /** 拖过之后就固定住用户选的位置，没拖过则一直停在右下角 */
   const draggedRef = useRef(false)
 
-  const clampBall = useCallback(
+  const clampFigure = useCallback(
     (p: Point) => ({
-      x: clamp(p.x, EDGE, Math.max(EDGE, viewport.w - ballBox.w - EDGE)),
-      y: clamp(p.y, EDGE, Math.max(EDGE, viewport.h - ballBox.h - EDGE)),
+      x: clamp(p.x, EDGE, Math.max(EDGE, viewport.w - figureBox.w - EDGE)),
+      y: clamp(p.y, EDGE, Math.max(EDGE, viewport.h - figureBox.h - EDGE)),
     }),
-    [ballBox, viewport],
+    [figureBox, viewport],
   )
 
-  // 量一次按钮的真实尺寸（名称行的宽度随字体而定），后面定位都用它
-  useLayoutEffect(() => {
-    const el = ballRef.current
+  // 量一次数字人的真实尺寸（宽度随资源比例而定），后面定位都用它；图片解码完再量一次
+  const measure = useCallback(() => {
+    const el = figureRef.current
     if (!el) return
     const next = { w: el.offsetWidth, h: el.offsetHeight }
-    setBallBox((prev) => (prev.w === next.w && prev.h === next.h ? prev : next))
+    if (next.w > 0) setFigureBox((prev) => (prev.w === next.w && prev.h === next.h ? prev : next))
   }, [])
 
-  // 首帧停到右下角；窗口尺寸变化时把拖过的球夹回视口内
+  // 图片未解码时 offsetWidth 会是 0，如果拿着 0 去定位会把人挤到视口边缘外，所以等 onLoad 再补量
   useLayoutEffect(() => {
-    setBall((prev) =>
+    measure()
+  }, [measure])
+
+  // 首帧停到右下角；窗口尺寸变化时把拖过的数字人夹回视口内
+  useLayoutEffect(() => {
+    setFigure((prev) =>
       draggedRef.current && prev
-        ? clampBall(prev)
-        : { x: viewport.w - ballBox.w - REST, y: viewport.h - ballBox.h - REST },
+        ? clampFigure(prev)
+        : { x: viewport.w - figureBox.w - REST, y: viewport.h - figureBox.h - REST },
     )
-  }, [ballBox, viewport, clampBall])
+  }, [figureBox, viewport, clampFigure])
 
   useEffect(() => {
     const onResize = () => setViewport({ w: window.innerWidth, h: window.innerHeight })
@@ -87,7 +96,7 @@ export function AssistantWidget() {
     return () => window.removeEventListener('resize', onResize)
   }, [])
 
-  // 浮窗打开时：Esc 或点击浮窗 / 悬浮球以外的地方收起
+  // 浮窗打开时：Esc 或点击浮窗 / 数字人以外的地方收起
   useEffect(() => {
     if (!open) return
     const onKeyDown = (e: KeyboardEvent) => {
@@ -95,7 +104,7 @@ export function AssistantWidget() {
     }
     const onPointerDown = (e: PointerEvent) => {
       const target = e.target as Node
-      if (panelRef.current?.contains(target) || ballRef.current?.contains(target)) return
+      if (panelRef.current?.contains(target) || figureRef.current?.contains(target)) return
       setOpen(false)
     }
     document.addEventListener('keydown', onKeyDown)
@@ -107,7 +116,7 @@ export function AssistantWidget() {
   }, [open])
 
   const handlePointerDown = (e: React.PointerEvent<HTMLButtonElement>) => {
-    const origin = ball ?? { x: e.clientX, y: e.clientY }
+    const origin = figure ?? { x: e.clientX, y: e.clientY }
     e.currentTarget.setPointerCapture(e.pointerId)
     dragRef.current = {
       dx: e.clientX - origin.x,
@@ -125,7 +134,7 @@ export function AssistantWidget() {
       drag.moved = true
       draggedRef.current = true
     }
-    if (drag.moved) setBall(clampBall({ x: e.clientX - drag.dx, y: e.clientY - drag.dy }))
+    if (drag.moved) setFigure(clampFigure({ x: e.clientX - drag.dx, y: e.clientY - drag.dy }))
   }
 
   const handlePointerUp = (e: React.PointerEvent<HTMLButtonElement>) => {
@@ -138,23 +147,25 @@ export function AssistantWidget() {
 
   const previewH = clamp(viewport.h - PANEL_HEADER_H - EDGE * 2, PREVIEW_MIN_H, PREVIEW_MAX_H)
   const panelH = PANEL_HEADER_H + previewH
-  const panelPos = ball
+  const panelPos = figure
     ? {
-        left: panelLeft(ball, ballBox.w, viewport.w),
-        top: clamp(ball.y + ballBox.h - panelH, EDGE, Math.max(EDGE, viewport.h - panelH - EDGE)),
+        left: panelLeft(figure, figureBox.w, viewport.w),
+        top: clamp(figure.y + figureBox.h - panelH, EDGE, Math.max(EDGE, viewport.h - panelH - EDGE)),
       }
     : null
 
   return (
     <>
       <button
-        ref={ballRef}
+        ref={figureRef}
         type="button"
         aria-label={open ? '收起安小能' : '打开安小能'}
         aria-expanded={open}
         aria-haspopup="dialog"
-        className="group fixed z-50 flex cursor-grab touch-none select-none active:cursor-grabbing"
-        style={{ left: ball?.x ?? -9999, top: ball?.y ?? -9999 }}
+        title="安小能"
+        className="group fixed top-0 left-0 z-50 flex cursor-grab touch-none select-none active:cursor-grabbing"
+        // 用 transform 定位：fixed 元素若直接用 left/top，宽度会被「左侧可用空间」限制住，人会被压扁
+        style={{ transform: `translate3d(${figure?.x ?? -9999}px, ${figure?.y ?? -9999}px, 0)` }}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
@@ -166,10 +177,13 @@ export function AssistantWidget() {
           if (e.detail === 0) setOpen((prev) => !prev)
         }}
       >
-        <span className="flex size-[72px] flex-col items-center justify-center gap-[3px] rounded-full border border-[#2E6FE0]/40 bg-[radial-gradient(120%_120%_at_30%_15%,#7BB0FF_0%,#347AFB_55%,#1D5CD8_100%)] text-white shadow-[0_10px_24px_-6px_rgba(29,92,216,0.65)] transition-transform duration-150 group-hover:scale-[1.04] group-active:scale-95">
-          <Bot className="size-[24px]" strokeWidth={1.9} />
-          <span className="text-[13px] leading-none font-medium tracking-[0.5px]">安小能</span>
-        </span>
+        <img
+          src={figureUrl}
+          alt=""
+          draggable={false}
+          onLoad={measure}
+          className="pointer-events-none h-[96px] w-auto object-contain drop-shadow-[0_10px_16px_rgba(12,40,90,0.3)] transition-transform duration-150 group-hover:scale-[1.04] group-active:scale-95"
+        />
       </button>
 
       {open && panelPos && (

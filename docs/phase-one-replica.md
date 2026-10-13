@@ -48,7 +48,7 @@
 1. **头像** —— 原图是真人照片，改用深色渐变圆 + 姓氏字
 2. **logo** —— 原图是定制图形，用 SVG 画了个近似的蓝红「A」形
 3. **图标** —— 原图是定制线稿，换成 lucide 里语义最接近的图标
-4. **交互** —— 除右下角「安小能」悬浮球外，全部是静态 `span`/`div`，没有点击/输入逻辑（演示用）
+4. **交互** —— 除右下角「安小能」数字人入口外，全部是静态 `span`/`div`，没有点击/输入逻辑（演示用）
 
 ## 跳转接线
 
@@ -56,21 +56,31 @@
 - 首页「综合平台集成入口」→ `/phase-one`
 - 首页「移动端集成入口」→ 待定（目前只 `console.log`）
 
-## 安小能悬浮球（`src/components/phase-one/assistant-widget.tsx`）
+## 安小能数字人悬浮入口（`src/components/phase-one/assistant-widget.tsx`）
 
-一期系统页右下角常驻一个可拖拽的圆形悬浮球，作为「安小能」的浮层入口。
+一期系统页右下角常驻一个可拖拽的安小能数字人，作为「安小能」的浮层入口。
 
-- 悬浮球：直径 **72** 的圆，机器人头像（lucide `Bot`）+ 名称「安小能」都排在圆里；
+- 数字人：品牌 VIS 图里抠出的正视图全身，直接当入口用（不套圆底），展示高度 **96**，
   初始停在右下角，边距 **24**（`REST`）
+- 数字人形象资源：`src/assets/an-xiaoneng-figure.png`（290×384，背景透明，`h-[96px] w-auto`）。
+  来自品牌 VIS 图 `/home/xx/logo.jpg` 的正视图全身，抠图命令：
+
+  ```bash
+  # 裁到正视图全身（原图 4001×2251）→ 四角 floodfill 去掉灰底 → 去边 → 缩到高 384
+  magick /home/xx/logo.jpg -crop 890x1080+460+740 +repage -alpha set -fuzz 12% \
+    -fill none -draw "color 0,0 floodfill" -draw "color 889,0 floodfill" \
+    -draw "color 0,1079 floodfill" -draw "color 889,1079 floodfill" \
+    -trim +repage -resize x384 -strip src/assets/an-xiaoneng-figure.png
+  ```
 - 拖拽：`pointerdown/move/up` + `setPointerCapture`，位移超过 **4px**（`DRAG_THRESHOLD`）才算拖拽，
   否则视为点击；拖拽中被夹在视口内，最小边距 **16**（`EDGE`）；窗口 resize 后重新夹一次
-- 浮窗：点悬浮球展开/收起，`role="dialog"` 的白色圆角面板，头部高 **44**（图标 + 名称 + 关闭），
+- 浮窗：点数字人展开/收起，`role="dialog"` 的白色圆角面板，头部高 **44**（图标 + 名称 + 关闭），
   主体是宽固定 **480**（窄于桌面断点，演示站仍走移动版布局）的 iframe，高度取
   `min(760, 视口高 - 44 - 32)`
-- 浮窗位置：优先摊在悬浮球左侧，左边放不下就翻到右侧，底边与悬浮球对齐，最后夹回视口
-- 收起：点悬浮球、点头部关闭、点浮窗外部（`pointerdown`）、按 Esc
-- 无障碍：悬浮球带 `aria-label`/`aria-expanded`/`aria-haspopup`，键盘 Enter/Space 走 `click`
-  （`event.detail === 0`）分支
+- 浮窗位置：优先摊在数字人左侧，左边放不下就翻到右侧，底边与数字人对齐，最后夹回视口
+- 收起：点数字人、点头部关闭、点浮窗外部（`pointerdown`）、按 Esc
+- 无障碍：入口按钮带 `aria-label`/`aria-expanded`/`aria-haspopup` + `title="安小能"`，
+  键盘 Enter/Space 走 `click`（`event.detail === 0`）分支
 - 演示站地址统一放在 `src/lib/demo-links.ts` 的 `AXN_DEMO_URL`，门户卡片与手机工作台图标共用
 
 ## 怎么验证
