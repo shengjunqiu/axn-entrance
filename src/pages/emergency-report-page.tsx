@@ -1,11 +1,11 @@
 import {
   ArrowLeft, CalendarDays, ChevronDown, ChevronUp, ClipboardList,
-  FilePlus2, FileText, Layers, LogOut, MapPinned, Minus,
+  FilePlus2, FileText, LogOut, MapPinned, Minus,
   MonitorUp, Newspaper, Plus, RotateCcw, Save, ScanLine,
-  Siren, Upload, UserRound, UsersRound,
+  Siren, UserRound, UsersRound,
 } from 'lucide-react'
 import './emergency-report.css'
-import { ReportDocumentPreview } from '@/components/phase-one/report-document-preview'
+import { ReportWritingSection } from '@/components/phase-one/report-writing-section'
 import { SummaryReportContent } from '@/components/phase-one/summary-report-content'
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
@@ -21,9 +21,10 @@ const menuItems = [
   { label: '总结复盘', icon: FileText, tone: 'orange', expand: true },
 ]
 
-/** 综合协调保障系统的静态样式复刻，不连接业务接口。 */
+/** 综合协调保障系统样式复刻；应急要情增加独立写作辅助，原业务按钮仍为展示。 */
 export function EmergencyReportPage({ summary = false }: { summary?: boolean }) {
   const [expandedMenu, setExpandedMenu] = useState<string | null>(summary ? '总结复盘' : '要情快报')
+  const [reportTitle, setReportTitle] = useState('')
 
   return (
     <div className={`emergency-report ${summary ? 'summary-report' : ''}`}>
@@ -98,8 +99,8 @@ export function EmergencyReportPage({ summary = false }: { summary?: boolean }) 
                   </div>
                 </div>
                 <div className="er-field er-name-field">
-                  <span className="er-label"><i>*</i>要情名称</span>
-                  <div className="er-input er-name er-placeholder">请输入要情名称</div>
+                  <label className="er-label" htmlFor="emergency-report-title"><i>*</i>要情名称</label>
+                  <input id="emergency-report-title" className="er-input er-name" placeholder="请输入要情名称" maxLength={200} value={reportTitle} onChange={event => setReportTitle(event.target.value)} />
                 </div>
               </div>
               <div className="er-form-row">
@@ -110,17 +111,7 @@ export function EmergencyReportPage({ summary = false }: { summary?: boolean }) 
               </div>
             </div>
 
-            <section className="er-report-section" aria-label="报告内容">
-              <div className="er-report-heading">
-                <h3><span className="er-section-mark" />报告内容<span className="er-heading-decoration">◆ · ◆ ·</span></h3>
-                <div className="er-report-actions">
-                  <button type="button" className="er-button"><Save />存为模板</button>
-                  <button type="button" className="er-button"><Layers />本单位模板</button>
-                  <button type="button" className="er-button"><Upload />上传文件</button>
-                </div>
-              </div>
-              <ReportDocumentPreview />
-            </section>
+            <ReportWritingSection title={reportTitle} />
           </div>}
         </main>
       </div>

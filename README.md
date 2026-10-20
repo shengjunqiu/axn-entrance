@@ -11,10 +11,12 @@
 
 ```bash
 pnpm install
-pnpm dev      # http://localhost:5173
+pnpm dev      # http://localhost:5177
 pnpm build    # tsc -b && vite build
 pnpm lint     # oxlint
 ```
+
+应急要情的 AI 写作功能和模型配置见 [功能说明](docs/report-writing.md)。
 
 ## 目录
 

@@ -6,9 +6,10 @@ import {
   Minus, Paintbrush, Plus, Redo2, Search, Settings2, Strikethrough,
   Underline, Undo2, WrapText,
 } from 'lucide-react'
+import type { ReactNode } from 'react'
 
-/** 仅还原文档编辑器的外观，工具栏及文档均为静态展示。 */
-export function ReportDocumentPreview({ summary = false }: { summary?: boolean }) {
+/** 保留文档编辑器外观；传入 children 时在固定抬头下方显示可编辑正文。格式工具栏仍为展示。 */
+export function ReportDocumentPreview({ summary = false, children, wordCount }: { summary?: boolean; children?: ReactNode; wordCount?: number }) {
   return (
     <div className={`er-editor ${summary ? 'sr-editor' : ''}`} aria-label="报告文档预览">
       <div className="er-editor-titlebar">
@@ -66,13 +67,14 @@ export function ReportDocumentPreview({ summary = false }: { summary?: boolean }
             <p className="er-letterhead-spaced">中国安能建设集团有限公司</p>
             <h4>应急救援要情</h4>
           </div>}
+          {children}
           <span className="er-paper-comment"><MessageSquarePlus /></span>
         </article>
         <span className="er-editor-assistant"><Bot /></span>
       </div>
       <div className="er-editor-horizontal-scroll"><span /></div>
       <div className="er-editor-statusbar">
-        <div className="er-editor-status-left"><List /><span className="er-tool-divider" /><span>页面：1/4</span><span>节：1/1</span><span>行：1</span><span>列：1</span><span className="er-tool-divider" /><span>字数：{summary ? '1809' : '1136'}</span></div>
+        <div className="er-editor-status-left"><List /><span className="er-tool-divider" /><span>{children ? '正文编辑' : '页面：1/4'}</span><span>节：1/1</span><span>行：1</span><span>列：1</span><span className="er-tool-divider" /><span>字数：{wordCount ?? (summary ? '1809' : '1136')}</span></div>
         <div className="er-editor-status-right"><Globe /><span className="er-tool-divider" /><Eye /><span className="er-tool-divider" /><Minus /><span>100%</span><Plus /><Maximize /></div>
       </div>
     </div>
