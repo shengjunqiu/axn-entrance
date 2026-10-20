@@ -34,7 +34,7 @@ export type PortalEntry = {
  */
 export const portalEntries: PortalEntry[] = [
   { id: 'business', title: '综合业务系统', icon: Box },
-  { id: 'coordination', title: '综合协调保障系统', icon: Laptop },
+  { id: 'coordination', title: '综合协调保障系统', icon: Laptop, href: '/coordination/emergency-report/new' },
   { id: 'decision-map', title: '辅助决策一张图', icon: Send },
   { id: 'mobile-app', title: '移动应用子系统', icon: ShieldUser },
   // 标注（vibe_1791766663815_wzsqskq61）：点击工程救援大模型卡片跳转到真实演示站点
