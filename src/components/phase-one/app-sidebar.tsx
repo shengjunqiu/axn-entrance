@@ -1,6 +1,7 @@
 import { ChevronDown, ChevronUp, PanelLeftClose, Phone } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { sideItems, type SideItem } from '@/lib/phase-one-data'
+import { Link } from 'react-router-dom'
 
 /** 品牌 logo：白底圆 + 蓝红「A」形标记（参考图 logo 的近似画法） */
 function BrandLogo() {
@@ -18,7 +19,7 @@ function MenuRow({ item }: { item: SideItem }) {
   const child = item.level === 'child'
   const Icon = item.icon
 
-  return (
+  const content = (
     <div
       className={cn(
         'relative flex items-center',
@@ -45,10 +46,11 @@ function MenuRow({ item }: { item: SideItem }) {
       )}
     </div>
   )
+  return item.href ? <Link to={item.href} className="block cursor-pointer hover:brightness-110" aria-current={item.active ? 'page' : undefined}>{content}</Link> : content
 }
 
 /** 左侧深色导航栏（参考图 axn2.png 左侧） */
-export function AppSidebar() {
+export function AppSidebar({ items = sideItems, userName = '王小明' }: { items?: SideItem[]; userName?: string }) {
   return (
     <aside className="relative flex w-60 shrink-0 flex-col bg-[#2A3962] text-[#E4EAF6]">
       {/* 品牌区 */}
@@ -66,7 +68,7 @@ export function AppSidebar() {
 
       {/* 菜单 */}
       <nav className="flex-1 overflow-y-auto">
-        {sideItems.map((item) => (
+        {items.map((item) => (
           <MenuRow key={item.label} item={item} />
         ))}
       </nav>
@@ -84,9 +86,9 @@ export function AppSidebar() {
       <div className="shrink-0 bg-[#2D4171] px-4 pt-4 pb-3">
         <div className="flex items-center gap-3">
           <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-[radial-gradient(circle_at_35%_30%,#7C8BA6_0%,#2A3A55_60%,#16202F_100%)] ring-2 ring-white/10">
-            <span className="text-[15px] font-medium text-white/85">王</span>
+            <span className="text-[15px] font-medium text-white/85">{userName[0]}</span>
           </span>
-          <span className="text-[15px] text-white">王小明</span>
+          <span className="text-[15px] text-white">{userName}</span>
         </div>
 
         <div className="mt-3 border-t border-dashed border-white/25 pt-3">

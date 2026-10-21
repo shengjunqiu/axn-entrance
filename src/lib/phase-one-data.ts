@@ -32,6 +32,7 @@ export type SideItem = {
   active?: boolean
   /** 用更深底色（上报信息） */
   dark?: boolean
+  href?: string
 }
 
 export const sideItems: SideItem[] = [

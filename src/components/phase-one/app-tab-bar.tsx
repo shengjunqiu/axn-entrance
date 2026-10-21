@@ -1,12 +1,13 @@
 import { ChevronDown, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { openedTabs } from '@/lib/phase-one-data'
+import { Link } from 'react-router-dom'
 
 /** 已打开页签栏（参考图 axn2.png 顶栏下方一行） */
-export function AppTabBar() {
+export function AppTabBar({ tabs = openedTabs }: { tabs?: { label: string; active: boolean }[] }) {
   return (
     <div className="flex h-11 shrink-0 items-stretch bg-[#F9F9F9] pr-3">
-      {openedTabs.map((tab) => (
+      {tabs.map((tab) => (
         <div
           key={tab.label}
           className={cn(
@@ -16,7 +17,7 @@ export function AppTabBar() {
               : 'text-[#3A4256]',
           )}
         >
-          {tab.label}
+          {tab.label === '编写日报' ? <Link to="/phase-one/duty-report/new" className="hover:text-[#367AF0]">{tab.label}</Link> : tab.label}
           <X className="size-3.5 text-[#98A0AE]" strokeWidth={2} />
         </div>
       ))}

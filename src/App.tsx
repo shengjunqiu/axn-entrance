@@ -4,6 +4,7 @@ import { MobilePage } from '@/pages/mobile-page'
 import { PhaseOnePage } from '@/pages/phase-one-page'
 import { PortalPage } from '@/pages/portal-page'
 import { EmergencyReportPage } from '@/pages/emergency-report-page'
+import { DutyReportPage } from '@/pages/duty-report-page'
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/portal" element={<PortalPage />} />
         {/* 一期系统集成入口 */}
         <Route path="/phase-one" element={<PhaseOnePage />} />
+        <Route path="/phase-one/duty-report/new" element={<DutyReportPage />} />
         <Route path="/coordination/emergency-report/new" element={<EmergencyReportPage key="emergency-report" />} />
         <Route path="/coordination/summary-report/new" element={<EmergencyReportPage key="summary-report" summary />} />
         {/* 移动端集成入口 */}
