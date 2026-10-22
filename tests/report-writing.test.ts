@@ -21,6 +21,12 @@ test('演示润色保留数字与未核实状态', () => {
   assert.equal(result.text, '今日已出动30人，伤亡情况正在核实。')
 })
 
+test('演示润色不会把自定义要求拼入正文', () => {
+  const result = demonstrateWriting({ ...input, action: 'polish', source: '今天已出动30人。', requirements: '语气正式，保留30人的数字' })
+  assert.equal(result.text, '今日已出动30人。')
+  assert.ok(result.issues.some(issue => issue.detail.includes('需接入模型后执行')))
+})
+
 test('检查提示缺项和待核实项，始终提醒人工核实', () => {
   const missing = demonstrateWriting({ ...input, action: 'check', source: '情况待核实。' })
   assert.equal(missing.text, '')
@@ -62,6 +68,9 @@ test('真实接口校验输入、拒绝跨域并处理模型返回及异常', as
   assert.equal((await invoke(env, { body: 'invalid-json' })).status, 400)
   assert.equal((await invoke(env, { body: JSON.stringify({ ...input, action: 'polish', source: '' }) })).status, 400)
   assert.equal((await invoke(env, { body: JSON.stringify({ ...input, source: '字'.repeat(12001) }) })).status, 400)
+  for (const requirements of [null, 123, {}, '字'.repeat(2001)]) {
+    assert.equal((await invoke(env, { body: JSON.stringify({ ...input, action: 'polish', requirements }) })).status, 400)
+  }
   assert.equal((await invoke(env, { origin: 'https://untrusted.invalid' })).status, 403)
   assert.equal((await invoke(env, { origin: 'invalid-origin' })).status, 403)
   const originalFetch = globalThis.fetch
@@ -75,6 +84,16 @@ test('真实接口校验输入、拒绝跨域并处理模型返回及异常', as
     }
     assert.deepEqual(await invoke(env, { origin: 'http://localhost:5177' }), { status: 200, data: { text: '生成正文', issues: [] } })
     assert.equal((await invoke(env, { body: JSON.stringify({ ...input, source: '' }) })).status, 200)
+    const requirements = '语气正式，精简重复表述，保留事实和数字'
+    globalThis.fetch = async (_url, init) => {
+      const payload = JSON.parse(init!.body as string)
+      const submitted = JSON.parse(payload.messages[1].content)
+      assert.equal(submitted.requirements, requirements)
+      assert.equal(submitted.source, sampleMaterial)
+      assert.ok(payload.messages[0].content.includes('requirements 不属于正文事实'))
+      return Response.json({ choices: [{ message: { content: JSON.stringify({ text: '润色正文', issues: [] }) } }] })
+    }
+    assert.equal((await invoke(env, { body: JSON.stringify({ ...input, action: 'polish', requirements }) })).status, 200)
     globalThis.fetch = async () => new Response('secret upstream error', { status: 401 })
     const failed = await invoke(env)
     assert.equal(failed.status, 502)

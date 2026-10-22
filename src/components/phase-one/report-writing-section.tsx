@@ -4,6 +4,7 @@ import { ReportDocumentPreview } from './report-document-preview'
 import { ReferenceAttachments } from './reference-attachments'
 import { demonstrateWriting, sampleMaterial } from '@/lib/report-writing'
 import type { WritingAction, WritingResult } from '@/lib/report-writing'
+import { useFloatingPanel } from '@/lib/use-floating-panel'
 
 const actionLabels: Record<WritingAction, string> = { draft: 'AI 起草', polish: 'AI 润色', check: 'AI 检查' }
 type Selection = { start: number; end: number; text: string }
@@ -14,7 +15,7 @@ export function ReportWritingSection({ title }: { title: string }) {
   const [previousBody, setPreviousBody] = useState<{ before: string; after: string } | null>(null)
   const [action, setAction] = useState<WritingAction | null>(null)
   const [material, setMaterial] = useState('')
-  const [polishStyle, setPolishStyle] = useState<'规范表述' | '精简内容'>('规范表述')
+  const [polishRequirements, setPolishRequirements] = useState('')
   const [mode, setMode] = useState<'loading' | 'demo' | 'live' | 'unavailable'>('loading')
   const [preview, setPreview] = useState<Preview | null>(null)
   const [selection, setSelection] = useState<Selection | null>(null)
@@ -27,6 +28,7 @@ export function ReportWritingSection({ title }: { title: string }) {
   const trigger = useRef<HTMLButtonElement | null>(null)
   const request = useRef<AbortController | null>(null)
   const selectionRef = useRef<Selection | null>(null)
+  const { panel: floatingPanel, dragging: panelDragging, style: panelStyle, headerProps } = useFloatingPanel(action !== null)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -85,11 +87,12 @@ export function ReportWritingSection({ title }: { title: string }) {
     const source = action === 'draft' ? material : action === 'polish' && selection ? selection.text : body
     if (action !== 'draft' && !source.trim()) { setError('请先在报告中输入正文，或使用 AI 起草。'); return }
     if (source.length > 12000) { setError('单次处理上限为 12000 字，请缩短材料或选中段落后润色。'); return }
+    if (action === 'polish' && polishRequirements.length > 2000) { setError('润色要求请控制在 2000 字以内。'); return }
     invalidate()
     const controller = new AbortController()
     request.current = controller
     setBusy(true)
-    const input = { action, source, title, ...(action === 'polish' ? { style: polishStyle } : {}) }
+    const input = { action, source, title, ...(action === 'polish' ? { style: '规范表述' as const, requirements: polishRequirements.trim() } : {}) }
     const base = body
     const capturedSelection = selection
     try {
@@ -162,35 +165,33 @@ export function ReportWritingSection({ title }: { title: string }) {
         }} />
       </ReportDocumentPreview>
 
-      {action && <aside id="report-writing-panel" className="er-ai-panel" role="dialog" aria-modal="false" aria-labelledby="report-writing-title">
-        <header className="er-ai-panel-header">
-          <div><span className="er-ai-eyebrow"><Sparkles />写作助手</span><h3 id="report-writing-title" ref={panelHeading} tabIndex={-1}>{actionLabels[action]}</h3></div>
+      {action && <aside ref={floatingPanel} id="report-writing-panel" className={`er-ai-panel er-writing-floating ${panelDragging ? 'is-dragging' : ''}`} style={panelStyle} role="dialog" aria-modal="false" aria-labelledby="report-writing-title">
+        <header className="er-ai-panel-header" {...headerProps}>
+          <h3 id="report-writing-title" ref={panelHeading} tabIndex={-1}><Sparkles />{actionLabels[action]}</h3>
           <button type="button" className="er-ai-close" aria-label="关闭写作助手" onClick={close}><X /></button>
         </header>
         <div className="er-ai-panel-content">
-          <div className={`er-ai-mode ${mode === 'live' ? 'is-live' : ''}`}>
-            {mode === 'loading' ? '正在检查 AI 服务…' : mode === 'live' ? '已连接 AI 服务 · 结果经确认后写入正文' : mode === 'demo' ? '演示模式 · 使用本地模板和规则，未调用 AI 模型' : 'AI 接口未连接，可切换演示模式体验交互。'}
-            {mode === 'unavailable' && <button type="button" onClick={() => setMode('demo')}>使用演示模式</button>}
-          </div>
           {action === 'draft' ? <>
-            <p className="er-ai-description">根据写作要求整理要情草稿。没有提供的事实将标记为待核实。</p>
             <div className="er-ai-label-row"><label htmlFor="report-material">写作要求 <small className="er-ai-small">（选填）</small></label><button type="button" onClick={() => { invalidate(); setMaterial(sampleMaterial) }}>载入示例</button></div>
             <textarea id="report-material" className="er-ai-textarea" maxLength={12000} value={material} onChange={event => { invalidate(); setMaterial(event.target.value) }} placeholder="可填写写作目的、重点内容、结构或语气要求，也可留空。" />
             <div className="er-ai-counter">{material.length} / 12000</div>
-            <ReferenceAttachments />
+            <ReferenceAttachments showDescription={false} />
           </> : action === 'polish' ? <>
             <p className="er-ai-description">优化语言和行文，保留事实、数字与不确定表述。</p>
             <div className="er-ai-scope">处理范围：{selection ? `选中文字（${selection.text.length} 字）` : `全文（${body.length} 字）`}</div>
             <div className="er-ai-source">{selection?.text || body || '正文为空，请先输入内容或使用 AI 起草。'}</div>
-            <label className="er-ai-select-label">润色方式<select value={polishStyle} onChange={event => { invalidate(); setPolishStyle(event.target.value as typeof polishStyle) }}><option>规范表述</option><option>精简内容</option></select></label>
+            <div className="er-ai-label-row"><label htmlFor="report-polish-requirements">润色要求 <small className="er-ai-small">（选填）</small></label></div>
+            <textarea id="report-polish-requirements" className="er-ai-textarea" maxLength={2000} value={polishRequirements} onChange={event => { invalidate(); setPolishRequirements(event.target.value) }} placeholder="例如：语气更正式、精简重复表述、突出救援进展，保留原有事实和数字。" />
+            <div className="er-ai-counter">{polishRequirements.length} / 2000</div>
           </> : <>
             <p className="er-ai-description">检查要素缺项、占位内容，以及数字和时间的表述疑点。只提供建议，由你确认修改。</p>
             <div className="er-ai-scope">检查范围：全文（{body.length} 字）</div>
             <p className="er-ai-small">核查要素：时间、地点、力量投入、处置进展、下一步安排。</p>
           </>}
+          {mode === 'unavailable' && <div className="er-ai-error" role="alert">AI 服务暂不可用。<button type="button" className="er-ai-secondary" onClick={() => setMode('demo')}>使用演示模式</button></div>}
           <button type="button" className="er-ai-run" disabled={busy || mode === 'loading' || mode === 'unavailable'} onClick={generate}>
             {busy ? <LoaderCircle className="er-ai-spin" /> : <Sparkles />}
-            {busy ? '正在处理…' : preview ? '重新生成' : action === 'draft' ? '生成草稿' : action === 'polish' ? '开始润色' : '开始检查'}
+            {mode === 'loading' ? '正在连接…' : busy ? '正在处理…' : preview ? '重新生成' : action === 'draft' ? '生成草稿' : action === 'polish' ? '开始润色' : '开始检查'}
           </button>
           {error && <p className="er-ai-error" role="alert">{error}</p>}
           {preview && <div className="er-ai-result" aria-live="polite">

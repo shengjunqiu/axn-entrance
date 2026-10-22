@@ -4,6 +4,7 @@ export type WritingRequest = {
   source: string
   title: string
   style?: '规范表述' | '精简内容'
+  requirements?: string
 }
 export type WritingResult = { text: string; issues: { title: string; detail: string }[] }
 
@@ -28,7 +29,7 @@ export function demonstrateWriting(request: WritingRequest): WritingResult {
   if (request.action === 'polish') {
     return {
       text: source.replace(/今天/g, '今日').replace(/目前正在/g, '目前正').replace(/伤亡情况还没核实/g, '伤亡情况正在核实').replace(/已经/g, '已').replace(/[ \t]+$/gm, ''),
-      issues: [{ title: '本地规则演示', detail: '仅替换少量常见口语，不执行模型改写或内容精简。真实润色需接入模型。' }],
+      issues: [{ title: '本地规则演示', detail: `仅替换少量常见口语，不执行模型改写或内容精简。真实润色需接入模型。${request.requirements?.trim() ? '自定义润色要求已记录，需接入模型后执行。' : ''}` }],
     }
   }
   return {
