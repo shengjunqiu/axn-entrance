@@ -1,4 +1,6 @@
-import { ArrowLeft, CalendarDays, ChevronDown, FilePlus2, FileText, Paperclip, Save, Upload } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { ArrowLeft, CalendarDays, CheckCircle2, ChevronDown, FilePlus2, FileText, LoaderCircle, Paperclip, Save, Sparkles, Upload } from 'lucide-react'
+import { DutyReportWritingPanel } from '@/components/phase-one/duty-report-writing-panel'
 import { AppSidebar } from '@/components/phase-one/app-sidebar'
 import { AppTopNav } from '@/components/phase-one/app-top-nav'
 import { AppTabBar } from '@/components/phase-one/app-tab-bar'
@@ -8,6 +10,32 @@ import './emergency-report.css'
 import './duty-report.css'
 
 export function DutyReportPage() {
+  const [writingOpen, setWritingOpen] = useState(false)
+  const [body, setBody] = useState('')
+  const [generation, setGeneration] = useState<'idle' | 'checking' | 'writing' | 'done'>('idle')
+  const [progress, setProgress] = useState(0)
+  const previousBody = useRef('')
+  const output = useRef<HTMLDivElement>(null)
+  const writingTrigger = useRef<HTMLButtonElement>(null)
+  const cancelGeneration = useCallback(() => {
+    setBody(previousBody.current)
+    setGeneration('idle')
+    setProgress(0)
+  }, [])
+
+  useEffect(() => {
+    if (generation !== 'writing') return
+    const canvas = output.current?.closest('.er-editor-canvas')
+    if (canvas && output.current) {
+      canvas.scrollTop = output.current.offsetTop + output.current.offsetHeight - canvas.clientHeight + 80
+    }
+  }, [body, generation])
+
+  function closeWriting() {
+    setWritingOpen(false)
+    writingTrigger.current?.focus()
+  }
+
   return (
     <div className="duty-page">
       <AppSidebar items={dutySideItems} userName="李霖枫" />
@@ -18,6 +46,7 @@ export function DutyReportPage() {
           <div className="dr-heading">
             <span className="dr-back"><ArrowLeft />返回</span><h1>新增日报</h1>
             <div className="dr-heading-actions">
+              <button ref={writingTrigger} type="button" className={`er-button dr-ai-trigger ${writingOpen ? 'is-active' : ''}`} aria-expanded={writingOpen} aria-controls="duty-report-writing-panel" onClick={() => setWritingOpen(true)}><Sparkles />AI 编写日报</button>
               <button type="button" className="er-button"><Upload />上传文件</button>
               <button type="button" className="dr-outline-button"><FileText />使用上次数据</button>
               <button type="button" className="er-button"><Save />保存草稿</button>
@@ -54,10 +83,18 @@ export function DutyReportPage() {
               </section>
               <div className="dr-generate"><button type="button" className="er-button"><FileText />生成文档并预览</button></div>
             </section>
-            <section className="dr-preview-column" aria-label="日报文档预览"><ReportDocumentPreview daily /></section>
+            <section className="dr-preview-column" aria-label="日报文档预览" aria-busy={generation === 'checking' || generation === 'writing'}>
+              {generation !== 'idle' && <div className={`dr-editor-generation ${generation === 'done' ? 'is-done' : ''}`} role="status">
+                {generation === 'done' ? <CheckCircle2 /> : <LoaderCircle className="er-ai-spin" />}
+                <span>{generation === 'checking' ? '正在模拟校验数据，校验完成后开始生成…' : generation === 'writing' ? `正在模拟生成文稿 · ${progress}%` : '文稿生成完成'}</span>
+                <small>模拟演示</small>
+              </div>}
+              <ReportDocumentPreview daily wordCount={body || generation === 'writing' ? body.replace(/\s/g, '').length : undefined}>{body || generation === 'writing' ? <div ref={output} className={`dr-document-text dr-generated-body ${generation === 'writing' ? 'is-writing' : ''}`}>{body}</div> : undefined}</ReportDocumentPreview>
+            </section>
           </div>
         </main>
       </div>
+      {writingOpen && <DutyReportWritingPanel onClose={closeWriting} onStart={() => { previousBody.current = body; setGeneration('checking'); setProgress(0) }} onWrite={(text, percent) => { setBody(text); setProgress(percent); setGeneration('writing') }} onFinish={() => setGeneration('done')} onCancel={cancelGeneration} />}
     </div>
   )
 }

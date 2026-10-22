@@ -54,6 +54,7 @@ export function ReportDocumentPreview({ summary = false, daily = false, children
             <div className="dr-document-text">
               <div className="dr-document-letterhead"><p>中国安能建设集团有限公司</p><h3>值班日报</h3></div>
               <div className="dr-document-dateline"><span>2026年10月21日11时28分</span><span>审阅：</span></div>
+              {!children && <>
               <h4>一、人员在位情况</h4>
               <p>全集团员工共1422人，其中在岗工作1240人（公司本部561人、一线施工440人、应急备勤239人），休假、出差等141人，转隶前长期待岗职工41人。</p>
               <p>（一）集团总部。现有员工95人，其中在岗工作85人（公司本部85人），休假、出差等10人。</p>
@@ -61,6 +62,7 @@ export function ReportDocumentPreview({ summary = false, daily = false, children
               <p>（三）第二工程局。现有员工175人，其中在岗工作127人（公司本部92人、一线施工35人），休假、出差等26人，转隶前长期待岗员工22人。</p>
               <p>（四）第三工程局。现有员工897人，其中在岗工作808人（公司本部178人、一线施工403人、应急备勤227人），休假、出差等89人。</p>
               <p>（五）安能科工。现有员工45人，其中在岗工作44人，休假、出差等1人。</p>
+              </>}
             </div>
           ) : summary ? (
             <div className="sr-document-text">
