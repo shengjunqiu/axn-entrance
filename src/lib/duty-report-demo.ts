@@ -7,12 +7,9 @@ function pause(milliseconds: number, signal: AbortSignal) {
   })
 }
 
-/** 本地演示时序；检查阶段完成后才逐步写入文稿。 */
-export async function runDutyReportDemo({ text, signal, onCheck, onWrite, wait = pause }: {
-  text: string
+export async function runDutyReportChecks({ signal, onCheck, wait = pause }: {
   signal: AbortSignal
   onCheck: (completed: number) => void
-  onWrite: (text: string, progress: number) => void
   wait?: (milliseconds: number, signal: AbortSignal) => Promise<void>
 }) {
   signal.throwIfAborted()
@@ -24,6 +21,17 @@ export async function runDutyReportDemo({ text, signal, onCheck, onWrite, wait =
   }
   await wait(600, signal)
   signal.throwIfAborted()
+}
+
+/** 本地演示时序；检查阶段完成后才逐步写入文稿。 */
+export async function runDutyReportDemo({ text, signal, onCheck, onWrite, wait = pause }: {
+  text: string
+  signal: AbortSignal
+  onCheck: (completed: number) => void
+  onWrite: (text: string, progress: number) => void
+  wait?: (milliseconds: number, signal: AbortSignal) => Promise<void>
+}) {
+  await runDutyReportChecks({ signal, onCheck, wait })
   const characters = Array.from(text)
   const chunkSize = Math.max(8, Math.ceil(characters.length / 100))
   onWrite('', 0)

@@ -1,6 +1,19 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { runDutyReportDemo } from '../src/lib/duty-report-demo.ts'
+import { runDutyReportChecks, runDutyReportDemo } from '../src/lib/duty-report-demo.ts'
+
+test('独立校验按顺序完成三项检查', async () => {
+  const completed: number[] = []
+  await runDutyReportChecks({ signal: new AbortController().signal, onCheck: value => completed.push(value), wait: async () => {} })
+  assert.deepEqual(completed, [0, 1, 2, 3])
+})
+
+test('独立校验取消后不再推进检查', async () => {
+  const controller = new AbortController()
+  const completed: number[] = []
+  await assert.rejects(runDutyReportChecks({ signal: controller.signal, onCheck: value => completed.push(value), wait: async () => { controller.abort() } }), { name: 'AbortError' })
+  assert.deepEqual(completed, [0])
+})
 
 test('校验完成后逐步写入，完整保留中文、输入内容及进度', async () => {
   const text = '一、人员在岗情况\n共1422人。\n二、应急救援情况\n已投入30人🚒\n三、舆情上访情况\n【待核实】'

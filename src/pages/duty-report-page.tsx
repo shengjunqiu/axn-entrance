@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { ArrowLeft, CalendarDays, CheckCircle2, ChevronDown, FilePlus2, FileText, LoaderCircle, Paperclip, Save, Sparkles, Upload } from 'lucide-react'
+import { ArrowLeft, CalendarDays, CheckCircle2, ChevronDown, FilePlus2, FileText, LoaderCircle, Paperclip, Save, ShieldCheck, Sparkles, Upload } from 'lucide-react'
+import { DutyReportValidationDialog } from '@/components/phase-one/duty-report-validation-dialog'
 import { DutyReportWritingPanel } from '@/components/phase-one/duty-report-writing-panel'
 import { AppSidebar } from '@/components/phase-one/app-sidebar'
 import { AppTopNav } from '@/components/phase-one/app-top-nav'
@@ -11,6 +12,9 @@ import './duty-report.css'
 
 export function DutyReportPage() {
   const [writingOpen, setWritingOpen] = useState(false)
+  const [validationOpen, setValidationOpen] = useState(false)
+  const [rescue, setRescue] = useState('')
+  const [publicOpinion, setPublicOpinion] = useState('')
   const [body, setBody] = useState('')
   const [generation, setGeneration] = useState<'idle' | 'checking' | 'writing' | 'done'>('idle')
   const [progress, setProgress] = useState(0)
@@ -47,6 +51,7 @@ export function DutyReportPage() {
             <span className="dr-back"><ArrowLeft />返回</span><h1>新增日报</h1>
             <div className="dr-heading-actions">
               <button ref={writingTrigger} type="button" className={`er-button dr-ai-trigger ${writingOpen ? 'is-active' : ''}`} aria-expanded={writingOpen} aria-controls="duty-report-writing-panel" onClick={() => setWritingOpen(true)}><Sparkles />AI 编写日报</button>
+              <button type="button" className="dr-outline-button dr-ai-trigger" aria-haspopup="dialog" aria-controls="duty-report-validation-dialog" disabled={generation === 'checking' || generation === 'writing'} onClick={() => setValidationOpen(true)}><ShieldCheck />AI 数据校验</button>
               <button type="button" className="er-button"><Upload />上传文件</button>
               <button type="button" className="dr-outline-button"><FileText />使用上次数据</button>
               <button type="button" className="er-button"><Save />保存草稿</button>
@@ -94,7 +99,8 @@ export function DutyReportPage() {
           </div>
         </main>
       </div>
-      {writingOpen && <DutyReportWritingPanel onClose={closeWriting} onStart={() => { previousBody.current = body; setGeneration('checking'); setProgress(0) }} onWrite={(text, percent) => { setBody(text); setProgress(percent); setGeneration('writing') }} onFinish={() => setGeneration('done')} onCancel={cancelGeneration} />}
+      {writingOpen && <DutyReportWritingPanel rescue={rescue} publicOpinion={publicOpinion} onRescueChange={setRescue} onPublicOpinionChange={setPublicOpinion} onClose={closeWriting} onStart={() => { previousBody.current = body; setGeneration('checking'); setProgress(0) }} onWrite={(text, percent) => { setBody(text); setProgress(percent); setGeneration('writing') }} onFinish={() => setGeneration('done')} onCancel={cancelGeneration} />}
+      {validationOpen && <DutyReportValidationDialog rescue={rescue} publicOpinion={publicOpinion} onClose={() => setValidationOpen(false)} />}
     </div>
   )
 }

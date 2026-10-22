@@ -4,15 +4,17 @@ import { ReferenceAttachments } from './reference-attachments'
 import { dutyRows, dutyTotal } from '@/lib/duty-report-data'
 import { runDutyReportDemo } from '@/lib/duty-report-demo'
 
-export function DutyReportWritingPanel({ onClose, onStart, onWrite, onFinish, onCancel }: {
+export function DutyReportWritingPanel({ rescue, publicOpinion, onRescueChange, onPublicOpinionChange, onClose, onStart, onWrite, onFinish, onCancel }: {
+  rescue: string
+  publicOpinion: string
+  onRescueChange: (value: string) => void
+  onPublicOpinionChange: (value: string) => void
   onClose: () => void
   onStart: () => void
   onWrite: (text: string, progress: number) => void
   onFinish: () => void
   onCancel: () => void
 }) {
-  const [rescue, setRescue] = useState('')
-  const [publicOpinion, setPublicOpinion] = useState('')
   const [phase, setPhase] = useState<'idle' | 'checking' | 'writing' | 'done'>('idle')
   const [checked, setChecked] = useState(0)
   const [progress, setProgress] = useState(0)
@@ -144,11 +146,11 @@ export function DutyReportWritingPanel({ onClose, onStart, onWrite, onFinish, on
         <fieldset className="dr-ai-inputs" disabled={busy}>
         <div className="dr-ai-field">
           <div className="er-ai-label-row"><label htmlFor="duty-report-rescue">应急救援情况 <small className="er-ai-small">（选填）</small></label></div>
-          <textarea id="duty-report-rescue" className="er-ai-textarea" maxLength={12000} value={rescue} onChange={event => { setRescue(event.target.value); invalidate() }} placeholder="填写救援任务、力量投入及处置进展等" />
+          <textarea id="duty-report-rescue" className="er-ai-textarea" maxLength={12000} value={rescue} onChange={event => { onRescueChange(event.target.value); invalidate() }} placeholder="填写救援任务、力量投入及处置进展等" />
         </div>
         <div className="dr-ai-field">
           <div className="er-ai-label-row"><label htmlFor="duty-report-public-opinion">舆情上访情况 <small className="er-ai-small">（选填）</small></label></div>
-          <textarea id="duty-report-public-opinion" className="er-ai-textarea" maxLength={12000} value={publicOpinion} onChange={event => { setPublicOpinion(event.target.value); invalidate() }} placeholder="填写舆情动态、上访事项及处理情况等" />
+          <textarea id="duty-report-public-opinion" className="er-ai-textarea" maxLength={12000} value={publicOpinion} onChange={event => { onPublicOpinionChange(event.target.value); invalidate() }} placeholder="填写舆情动态、上访事项及处理情况等" />
         </div>
         <ReferenceAttachments documentsOnly showDescription={false} maxFiles={null} />
         </fieldset>
