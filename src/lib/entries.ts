@@ -1,16 +1,16 @@
-import { Monitor, Smartphone, SquareStack } from 'lucide-react'
+import { Monitor, Smartphone, SquareStack, WifiOff } from 'lucide-react'
 
-export type EntryId = 'desktop-portal' | 'phase-one' | 'mobile'
+export type EntryId = 'desktop-portal' | 'phase-one' | 'mobile' | 'offline'
 
 export type Entry = {
   id: EntryId
   title: string
-  description: string
+  description?: string
   icon: typeof Monitor
   tags: string[]
 }
 
-/** 三个集成入口的展示配置，跳转目标在后续步骤补充 */
+/** 首页入口的展示配置 */
 export const entries: Entry[] = [
   {
     id: 'desktop-portal',
@@ -33,5 +33,11 @@ export const entries: Entry[] = [
     description: '面向手机端的轻量入口，适配移动浏览器与内嵌 WebView。',
     icon: Smartphone,
     tags: ['H5', 'WebView'],
+  },
+  {
+    id: 'offline',
+    title: '安小能离线版',
+    icon: WifiOff,
+    tags: [],
   },
 ]

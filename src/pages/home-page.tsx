@@ -1,30 +1,22 @@
 import { Bot } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { EntryCard } from '@/components/entry-card'
-import { entries, type Entry } from '@/lib/entries'
+import { entries, type EntryId } from '@/lib/entries'
 
-/** 首页：三个集成入口 */
+const entryRoutes: Record<EntryId, string> = {
+  'desktop-portal': '/portal',
+  'phase-one': '/phase-one',
+  mobile: '/mobile',
+  offline: '/offline',
+}
+
+/** 首页入口 */
 export function HomePage() {
   const navigate = useNavigate()
 
-  const handleEnter = (entry: Entry) => {
-    if (entry.id === 'desktop-portal') {
-      navigate('/portal')
-      return
-    }
-    if (entry.id === 'phase-one') {
-      navigate('/phase-one')
-      return
-    }
-    if (entry.id === 'mobile') {
-      navigate('/mobile')
-      return
-    }
-  }
-
   return (
     <div className="flex min-h-svh flex-col bg-muted/30">
-      <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col justify-center px-6 py-16 sm:py-24">
+      <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col justify-center px-6 py-16 sm:py-24">
         <header className="flex flex-col items-center text-center">
           <div className="flex size-12 items-center justify-center rounded-xl bg-primary text-primary-foreground">
             <Bot className="size-6" />
@@ -37,9 +29,9 @@ export function HomePage() {
           </p>
         </header>
 
-        <section className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <section className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {entries.map((entry) => (
-            <EntryCard key={entry.id} entry={entry} onEnter={handleEnter} />
+            <EntryCard key={entry.id} entry={entry} onEnter={() => navigate(entryRoutes[entry.id])} />
           ))}
         </section>
       </main>

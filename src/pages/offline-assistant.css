@@ -1,0 +1,75 @@
+/*
+ * 安小能离线版的表面色与尺寸 token。主色、焦点环继承全局主题，保证从首页跳转过来色调一致。
+ * 圆角固定三档：rounded-lg (10px) 控件 · rounded-xl (14px) 卡片 · rounded-2xl (18px) 输入框与气泡。
+ */
+.offline-assistant {
+  --radius: 0.625rem;
+  --background: #fff;
+  --foreground: #161b26;
+  --muted: #f6f7f9;
+  --muted-foreground: #5b6475;
+  --border: #e7e9ee;
+  --offline-accent-surface: color-mix(in oklch, var(--primary) 7%, #fff);
+  --offline-chat-width: 760px;
+  --offline-shadow-sm: 0 1px 2px rgb(22 27 38 / 4%);
+  --offline-shadow-md: 0 1px 2px rgb(22 27 38 / 4%), 0 6px 20px rgb(22 27 38 / 6%);
+  --offline-shadow-lg: 0 2px 6px rgb(22 27 38 / 5%), 0 16px 40px rgb(22 27 38 / 10%);
+
+  font-feature-settings: 'tnum' 0;
+}
+
+.offline-assistant .tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (min-width: 1024px) {
+  .offline-chat-workspace[data-empty] {
+    justify-content: safe center;
+    overflow-y: auto;
+    /* Bias the welcome group toward the upper third instead of dead center. */
+    padding-block: 24px clamp(96px, 22vh, 220px);
+  }
+
+  .offline-chat-workspace[data-empty] .offline-welcome {
+    flex: none;
+    overflow: visible;
+  }
+}
+
+@keyframes offline-thinking {
+  0%, 80%, 100% { opacity: 0.25; transform: translateY(0); }
+  40% { opacity: 1; transform: translateY(-2px); }
+}
+
+.offline-thinking-dot {
+  animation: offline-thinking 1.2s ease-in-out infinite;
+}
+
+.offline-thinking-dot:nth-child(2) { animation-delay: 0.15s; }
+.offline-thinking-dot:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes offline-voice {
+  0%, 100% { height: 6px; }
+  50% { height: 18px; }
+}
+
+.offline-voice-bar {
+  height: 6px;
+  animation: offline-voice 0.9s ease-in-out infinite;
+}
+
+@keyframes offline-speak {
+  0%, 100% { height: 4px; }
+  50% { height: 14px; }
+}
+
+.offline-speak-bar {
+  height: 4px;
+  animation: offline-speak 0.8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .offline-speak-bar { animation: none; height: 10px; }
+  .offline-thinking-dot { animation: none; opacity: 0.6; }
+  .offline-voice-bar { animation: none; height: 12px; }
+}
