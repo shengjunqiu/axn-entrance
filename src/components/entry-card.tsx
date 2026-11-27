@@ -12,7 +12,7 @@ import type { Entry } from '@/lib/entries'
 
 type EntryCardProps = {
   entry: Entry
-  onEnter: (entry: Entry) => void
+  onEnter: () => void
 }
 
 export function EntryCard({ entry, onEnter }: EntryCardProps) {
@@ -25,21 +25,25 @@ export function EntryCard({ entry, onEnter }: EntryCardProps) {
           <Icon className="size-5" />
         </div>
         <CardTitle className="mt-2 text-lg">{entry.title}</CardTitle>
-        <CardDescription className="leading-relaxed">
-          {entry.description}
-        </CardDescription>
+        {entry.description && (
+          <CardDescription className="leading-relaxed">
+            {entry.description}
+          </CardDescription>
+        )}
       </CardHeader>
 
-      <CardContent className="flex flex-wrap gap-1.5">
-        {entry.tags.map((tag) => (
-          <Badge key={tag} variant="secondary">
-            {tag}
-          </Badge>
-        ))}
-      </CardContent>
+      {entry.tags.length > 0 && (
+        <CardContent className="flex flex-wrap gap-1.5">
+          {entry.tags.map((tag) => (
+            <Badge key={tag} variant="secondary">
+              {tag}
+            </Badge>
+          ))}
+        </CardContent>
+      )}
 
       <CardContent className="mt-auto">
-        <Button className="w-full" onClick={() => onEnter(entry)}>
+        <Button className="w-full" onClick={onEnter}>
           进入入口
           <ArrowRight data-icon="inline-end" />
         </Button>
