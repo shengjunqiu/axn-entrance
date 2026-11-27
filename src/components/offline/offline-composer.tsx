@@ -162,7 +162,7 @@ export function OfflineComposer({ draft, onDraftChange, generating, desktop, com
             <Mic className="size-[18px]" aria-hidden="true" />
           </Button>
           {generating ? (
-            <Button type="submit" size="icon-lg" aria-label="停止生成" title="停止生成" className="size-9 rounded-lg bg-foreground text-background hover:bg-foreground/85">
+            <Button type="submit" size="icon-lg" aria-label="停止生成" title="停止生成" className="rounded-full">
               <Square className="size-3.5 fill-current" aria-hidden="true" />
             </Button>
           ) : (
@@ -172,7 +172,7 @@ export function OfflineComposer({ draft, onDraftChange, generating, desktop, com
               aria-label="发送消息"
               title="发送"
               disabled={!canSend}
-              className="size-9 rounded-lg transition-colors disabled:bg-muted disabled:text-muted-foreground/60 disabled:opacity-100"
+              className="size-9 rounded-full transition-colors disabled:bg-muted disabled:text-muted-foreground/60 disabled:opacity-100"
             >
               <ArrowUp className="size-5" aria-hidden="true" />
             </Button>

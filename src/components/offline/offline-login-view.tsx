@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef, useState } from 'react'
 import { ArrowLeft, ArrowRight, Eye, EyeOff } from 'lucide-react'
-import figureUrl from '@/assets/an-xiaoneng-figure.png'
+import { AN_XIAONENG_ICON_URL } from '@/lib/an-xiaoneng-icon'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 
@@ -24,9 +24,7 @@ function BrandPanel({ compact = false, className }: { compact?: boolean; classNa
 
       {compact ? (
         <div className="relative flex items-center gap-3.5 p-5">
-          <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-white/95 shadow-sm" aria-hidden="true">
-            <img src={figureUrl} alt="" className="size-10 object-contain" />
-          </span>
+          <img src={AN_XIAONENG_ICON_URL} alt="" className="size-12 shrink-0 rounded-xl shadow-sm" />
           <div className="min-w-0">
             <div className="flex items-center gap-2">
               <span className="text-lg leading-tight font-semibold">安小能</span>
@@ -38,9 +36,7 @@ function BrandPanel({ compact = false, className }: { compact?: boolean; classNa
       ) : (
         <div className="relative flex h-full flex-col justify-center px-12 pb-[8vh]">
           <div className="flex items-center gap-3">
-            <span className="grid size-12 place-items-center rounded-xl bg-white/95 shadow-sm" aria-hidden="true">
-              <img src={figureUrl} alt="" className="size-10 object-contain" />
-            </span>
+            <img src={AN_XIAONENG_ICON_URL} alt="" className="size-12 shrink-0 rounded-xl shadow-sm" />
             <span className="text-xl font-semibold">安小能</span>
             <PanelBadge />
           </div>

@@ -56,34 +56,23 @@
 - 首页「综合平台集成入口」→ `/phase-one`
 - 首页「移动端集成入口」→ 待定（目前只 `console.log`）
 
-## 安小能数字人悬浮入口（`src/components/phase-one/assistant-widget.tsx`）
+## 安小能悬浮入口（`src/components/phase-one/assistant-widget.tsx`）
 
-一期系统页右下角常驻一个可拖拽的安小能数字人，作为「安小能」的浮层入口。
+一期系统页右下角常驻一个可拖拽的「安小能」悬浮入口。
 
-- 数字人：品牌 VIS 图里抠出的正视图全身，直接当入口用（不套圆底），展示高度 **120**，
+- 图标：使用共享资源 `public/an-xiaoneng.png`，入口显示为 **88 × 88** 的圆角方形，
   下方挂一个名字小标签（白底 `bg-white/95` + 品牌蓝字 + 淡边框、`rounded-full`），
   初始停在右下角，边距 **24**（`REST`）
-- 悬停时整个人（图 + 标签）整体放大 **1.04**，按下缩到 **0.95**
-- 数字人形象资源：`src/assets/an-xiaoneng-figure.png`（290×384，背景透明，`h-[120px] w-auto`）。
-  来自品牌 VIS 图 `/home/xx/logo.jpg` 的正视图全身，抠图命令：
-
-  ```bash
-  # 裁到正视图全身（原图 4001×2251）→ 四角 floodfill 去掉灰底 → 去边 → 缩到高 384
-  magick /home/xx/logo.jpg -crop 890x1080+460+740 +repage -alpha set -fuzz 12% \
-    -fill none -draw "color 0,0 floodfill" -draw "color 889,0 floodfill" \
-    -draw "color 0,1079 floodfill" -draw "color 889,1079 floodfill" \
-    -trim +repage -resize x384 -strip src/assets/an-xiaoneng-figure.png
-  ```
+- 悬停时图标和标签整体放大 **1.04**，按下缩到 **0.95**
 - 拖拽：`pointerdown/move/up` + `setPointerCapture`，位移超过 **4px**（`DRAG_THRESHOLD`）才算拖拽，
   否则视为点击；拖拽中被夹在视口内，最小边距 **16**（`EDGE`）；窗口 resize 后重新夹一次
-- 浮窗：点数字人展开/收起，`role="dialog"` 的白色圆角面板，头部高 **44**（图标 + 名称 + 关闭），
+- 浮窗：点入口展开或收起，`role="dialog"` 的白色圆角面板，头部高 **44**（图标 + 名称 + 关闭），
   主体是宽固定 **480**（窄于桌面断点，演示站仍走移动版布局）的 iframe，高度取
   `min(760, 视口高 - 44 - 32)`
 - 定位：按钮 `fixed top-0 left-0` + `transform: translate3d()` 摆位置。
-  不要改成直接写 `left/top`：那样 `fixed` 元素的宽度会被左侧可用空间限制，人会被压扁。
-  尺寸在 `useLayoutEffect` 里量一次，并且在图的 `onLoad` 里补量（图未解码时 `offsetWidth` 是 0）
-- 浮窗位置：优先摊在数字人左侧，左边放不下就翻到右侧，底边与数字人对齐，最后夹回视口
-- 收起：点数字人、点头部关闭、点浮窗外部（`pointerdown`）、按 Esc
+  在 `useLayoutEffect` 中量取包含图标和标签的按钮尺寸，用于限制拖拽范围和定位浮窗。
+- 浮窗位置：优先在入口左侧展示，左边放不下就翻到右侧，底边与入口对齐，最后夹回视口
+- 收起：点入口、点头部关闭、点浮窗外部（`pointerdown`）、按 Esc
 - 无障碍：入口按钮带 `aria-label`/`aria-expanded`/`aria-haspopup` + `title="安小能"`，
   键盘 Enter/Space 走 `click`（`event.detail === 0`）分支
 - 演示站地址统一放在 `src/lib/demo-links.ts` 的 `AXN_DEMO_URL`，门户卡片与手机工作台图标共用

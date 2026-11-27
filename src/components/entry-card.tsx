@@ -21,9 +21,13 @@ export function EntryCard({ entry, onEnter }: EntryCardProps) {
   return (
     <Card className="transition-shadow hover:ring-foreground/25 hover:shadow-md">
       <CardHeader>
-        <div className="flex size-10 items-center justify-center rounded-lg bg-muted text-foreground">
-          <Icon className="size-5" />
-        </div>
+        {typeof Icon === 'string' ? (
+          <img src={Icon} alt="" className="size-10 rounded-lg" />
+        ) : (
+          <div className="flex size-10 items-center justify-center rounded-lg bg-muted text-foreground">
+            <Icon className="size-5" />
+          </div>
+        )}
         <CardTitle className="mt-2 text-lg">{entry.title}</CardTitle>
         {entry.description && (
           <CardDescription className="leading-relaxed">

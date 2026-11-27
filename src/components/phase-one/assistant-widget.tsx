@@ -1,16 +1,11 @@
-import { Bot, X } from 'lucide-react'
+import { X } from 'lucide-react'
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 
-import figureUrl from '@/assets/an-xiaoneng-figure.png'
+import { AN_XIAONENG_ICON_URL } from '@/lib/an-xiaoneng-icon'
 import { AXN_DEMO_URL } from '@/lib/demo-links'
 
-/**
- * 安小能数字人形象：从品牌 VIS 图里抠出的正视图全身（背景透明），直接当悬浮入口用。
- * 展示高度 120，宽度按图片比例自适应（资源 290×384，比例约 0.755），下方再挂一个名字小标签。
- */
-
-/** 首帧还没量到真实尺寸时的兜底（与 h-[120px] + 资源比例 + 标签一致） */
-const FIGURE_BOX_FALLBACK = { w: 91, h: 146 }
+/** 首帧还没量到真实尺寸时，按 88px 图标和名称标签估算 */
+const FIGURE_BOX_FALLBACK = { w: 88, h: 114 }
 
 /** 浮窗内容宽固定 480，窄于桌面断点，演示站仍走移动版布局 */
 const PREVIEW_W = 480
@@ -43,7 +38,7 @@ function panelLeft(figure: Point, figureW: number, viewportW: number) {
 }
 
 /**
- * 一期系统里的「安小能」悬浮入口：右下角悬浮一整只数字人（品牌 VIS 里的正视图，背景透明），
+ * 一期系统里的「安小能」悬浮入口：右下角展示品牌图标，
  * 可拖拽。点击展开浮窗，浮窗里用 iframe 加载演示站，宽度固定 480px（窄于桌面断点）让演示站走移动版布局。
  * 数字人始终被夹在视口内，窗口尺寸变化时也会重新夹一次。收起方式：点数字人、点关闭、
  * 点浮窗外部、按 Esc。
@@ -68,7 +63,7 @@ export function AssistantWidget() {
     [figureBox, viewport],
   )
 
-  // 量一次数字人的真实尺寸（宽度随资源比例而定），后面定位都用它；图片解码完再量一次
+  // 读取包含图标和标签的实际按钮尺寸，用于拖拽边界和浮窗定位。
   const measure = useCallback(() => {
     const el = figureRef.current
     if (!el) return
@@ -76,7 +71,6 @@ export function AssistantWidget() {
     if (next.w > 0) setFigureBox((prev) => (prev.w === next.w && prev.h === next.h ? prev : next))
   }, [])
 
-  // 图片未解码时 offsetWidth 会是 0，如果拿着 0 去定位会把人挤到视口边缘外，所以等 onLoad 再补量
   useLayoutEffect(() => {
     measure()
   }, [measure])
@@ -179,11 +173,10 @@ export function AssistantWidget() {
       >
         <span className="flex flex-col items-center transition-transform duration-150 group-hover:scale-[1.04] group-active:scale-95">
           <img
-            src={figureUrl}
+            src={AN_XIAONENG_ICON_URL}
             alt=""
             draggable={false}
-            onLoad={measure}
-            className="pointer-events-none h-[120px] w-auto object-contain drop-shadow-[0_12px_18px_rgba(12,40,90,0.3)]"
+            className="pointer-events-none size-[88px] rounded-[22px] shadow-[0_12px_18px_rgba(12,40,90,0.25)]"
           />
           <span className="mt-[4px] rounded-full border border-[#D8DEE9] bg-white/95 px-[10px] py-[3px] text-[14px] leading-none font-medium text-[#1D5CD8] shadow-[0_2px_6px_rgba(23,42,84,0.14)]">
             安小能
@@ -201,9 +194,7 @@ export function AssistantWidget() {
           style={{ left: panelPos.left, top: panelPos.top, width: PANEL_W }}
         >
           <div className="flex h-[44px] items-center gap-[8px] border-b border-[#E7ECF3] bg-[#F7F9FB] px-[12px]">
-            <span className="flex size-[26px] items-center justify-center rounded-full bg-[radial-gradient(120%_120%_at_30%_15%,#7BB0FF_0%,#347AFB_55%,#1D5CD8_100%)] text-white">
-              <Bot className="size-[16px]" strokeWidth={2} />
-            </span>
+            <img src={AN_XIAONENG_ICON_URL} alt="" className="size-[26px] rounded-[7px]" />
             <span className="text-[14px] font-medium text-[#1F2937]">安小能</span>
             <button
               type="button"

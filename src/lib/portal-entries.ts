@@ -1,5 +1,6 @@
-import { Bot, Box, Laptop, Send, ShieldUser, type LucideIcon } from 'lucide-react'
+import { Box, Laptop, Send, ShieldUser, type LucideIcon } from 'lucide-react'
 
+import { AN_XIAONENG_ICON_URL } from '@/lib/an-xiaoneng-icon'
 import { AXN_DEMO_URL } from '@/lib/demo-links'
 
 export type PortalEntryId =
@@ -12,7 +13,7 @@ export type PortalEntryId =
 export type PortalEntry = {
   id: PortalEntryId
   title: string
-  icon: LucideIcon
+  icon: LucideIcon | string
   /**
    * 点击后的跳转地址（可选）。填写后点卡片就会跳到该地址，
    * 留空则在 portal-page.tsx 的 handleEnter 里走待定的分支。
@@ -39,5 +40,5 @@ export const portalEntries: PortalEntry[] = [
   { id: 'mobile-app', title: '移动应用子系统', icon: ShieldUser },
   // 标注（vibe_1791766663815_wzsqskq61）：点击工程救援大模型卡片跳转到真实演示站点
   // 标注（vibe_1791857300706_lht06fj16）：卡片文案改为「工程救援大模型」
-  { id: 'an-xiaoneng', title: '工程救援大模型', icon: Bot, href: AXN_DEMO_URL },
+  { id: 'an-xiaoneng', title: '工程救援大模型', icon: AN_XIAONENG_ICON_URL, href: AXN_DEMO_URL },
 ]

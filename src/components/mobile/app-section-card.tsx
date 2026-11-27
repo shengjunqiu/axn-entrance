@@ -8,10 +8,12 @@ function AppTile({ item, onOpenPreview }: { item: AppItem; onOpenPreview: (url: 
     <>
       <div className="relative">
         <div
-          className="flex size-[45.3px] items-center justify-center rounded-[12px] text-white"
+          className="flex size-[45.3px] items-center justify-center overflow-hidden rounded-[12px] text-white"
           style={{ backgroundColor: item.color }}
         >
-          {Icon ? (
+          {typeof Icon === 'string' ? (
+            <img src={Icon} alt="" className="size-full" />
+          ) : Icon ? (
             <Icon className="size-[23px]" strokeWidth={1.9} />
           ) : (
             <span className="text-[22px] leading-none font-semibold tracking-tight">

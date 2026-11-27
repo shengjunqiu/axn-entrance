@@ -48,9 +48,13 @@ export function PortalCard({ entry, onEnter }: PortalCardProps) {
           {entry.title}
         </span>
 
-        {/* 六边形图标 */}
+        {/* 入口图标 */}
         <span className="absolute left-1/2 top-[83.4cqw] size-[31cqw] -translate-x-1/2 -translate-y-1/2">
-          <HexagonIcon icon={Icon} />
+          {typeof Icon === 'string' ? (
+            <img src={Icon} alt="" className="size-full rounded-[7cqw]" />
+          ) : (
+            <HexagonIcon icon={Icon} />
+          )}
         </span>
     </>
   )

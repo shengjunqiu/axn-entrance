@@ -1,4 +1,5 @@
-import { Monitor, Smartphone, SquareStack, WifiOff } from 'lucide-react'
+import { Monitor, Smartphone, SquareStack, type LucideIcon } from 'lucide-react'
+import { AN_XIAONENG_ICON_URL } from '@/lib/an-xiaoneng-icon'
 
 export type EntryId = 'desktop-portal' | 'phase-one' | 'mobile' | 'offline'
 
@@ -6,7 +7,7 @@ export type Entry = {
   id: EntryId
   title: string
   description?: string
-  icon: typeof Monitor
+  icon: LucideIcon | string
   tags: string[]
 }
 
@@ -37,7 +38,7 @@ export const entries: Entry[] = [
   {
     id: 'offline',
     title: '安小能离线版',
-    icon: WifiOff,
+    icon: AN_XIAONENG_ICON_URL,
     tags: [],
   },
 ]

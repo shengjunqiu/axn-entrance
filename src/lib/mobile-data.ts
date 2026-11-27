@@ -2,7 +2,6 @@ import {
   Archive,
   BookOpen,
   BookUser,
-  Bot,
   Boxes,
   CalendarDays,
   ClipboardList,
@@ -22,6 +21,7 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 
+import { AN_XIAONENG_ICON_URL } from '@/lib/an-xiaoneng-icon'
 import { AXN_DEMO_URL } from '@/lib/demo-links'
 
 /** 手机屏幕逻辑尺寸（CSS px）。参考图 axn3.png 为 1284×2778，即 428×926 @3x，此处 1:1 对应 */
@@ -36,7 +36,7 @@ export type AppItem = {
   label: string
   /** 图标底色，逐像素采样自参考图 */
   color: string
-  icon?: LucideIcon
+  icon?: LucideIcon | string
   /** 用文字代替图标（如 AI、A） */
   text?: string
   badge?: number
@@ -75,7 +75,7 @@ export const appSections: AppSection[] = [
       { label: '会议日程-安能通', color: '#FFAD00', icon: CalendarDays },
       { label: '安全生产监管系统', color: '#1357EA', text: 'A' },
       // 标注（vibe_1791773714406_pg01o976q）：新增「安小能」功能入口（参考图外的新增项）
-      { label: '安小能', color: '#347AFB', icon: Bot, previewUrl: AXN_DEMO_URL },
+      { label: '安小能', color: '#347AFB', icon: AN_XIAONENG_ICON_URL, previewUrl: AXN_DEMO_URL },
     ],
   },
   {
