@@ -1,4 +1,4 @@
-import { createDemoConversations } from './offline-chat-demo'
+import { createDemoConversations, refreshOfflineDemoConversation } from './offline-chat-demo.ts'
 import type { OfflineChatSourceId } from './offline-chat-sources'
 
 export const offlineHistoryStorageKey = 'axn-offline-chat-history-v1'
@@ -41,7 +41,7 @@ function readOfflineHistory() {
   try {
     const stored: unknown = JSON.parse(localStorage.getItem(offlineHistoryStorageKey) ?? '[]')
     if (Array.isArray(stored)) {
-      const existing = stored.filter(isConversation)
+      const existing = stored.filter(isConversation).map(refreshOfflineDemoConversation)
       const existingIds = new Set(existing.map(({ id }) => id))
       const demos = createDemoConversations().filter(({ id }) => !existingIds.has(id))
       return [...existing, ...demos].sort((a, b) => b.updatedAt - a.updatedAt)
@@ -49,7 +49,7 @@ function readOfflineHistory() {
 
     if (stored && typeof stored === 'object' && 'version' in stored && stored.version === 1
       && 'conversations' in stored && Array.isArray(stored.conversations)) {
-      return stored.conversations.filter(isConversation).sort((a, b) => b.updatedAt - a.updatedAt)
+      return stored.conversations.filter(isConversation).map(refreshOfflineDemoConversation).sort((a, b) => b.updatedAt - a.updatedAt)
     }
     return null
   } catch {

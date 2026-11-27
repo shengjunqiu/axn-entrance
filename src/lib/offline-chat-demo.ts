@@ -1,7 +1,7 @@
 import type { ChatAttachment, ChatTurn, OfflineConversation } from './offline-chat-history'
-import { offlineChatSources, type OfflineChatSourceId } from './offline-chat-sources'
+import { offlineChatSources, type OfflineChatSourceId } from './offline-chat-sources.ts'
 
-const scenarios: Omit<OfflineConversation, 'updatedAt'>[] = [
+const legacyScenarios: Omit<OfflineConversation, 'updatedAt'>[] = [
   {
     id: 'demo-rescue-flood',
     pinned: true,
@@ -81,6 +81,91 @@ const scenarios: Omit<OfflineConversation, 'updatedAt'>[] = [
   },
 ]
 
+const scenarios: Omit<OfflineConversation, 'updatedAt'>[] = [
+  {
+    id: 'demo-rescue-flood',
+    pinned: true,
+    turns: [
+      {
+        question: '暴雨引发城市内涝时怎么避险？',
+        sourceIds: ['urbanFloodSafety'],
+        reply: '尽早离开低洼地带和地下空间，沿安全路线向地势较高的地方转移。绕开积水的下穿隧道、涵洞和地下通道，步行和驾车都不要冒险穿过不清楚深度的积水。关注当地预警和转移通知，按现场引导撤离。',
+      },
+      {
+        question: '地下车库已经进水，还能下去挪车吗？',
+        sourceIds: ['urbanFloodSafety'],
+        reply: '不要进入已经进水的地下车库挪车。暴雨中地下空间可能迅速被淹。优先保障人员安全，远离车库入口，按现场引导前往安全区域。',
+      },
+    ],
+  },
+  {
+    id: 'demo-rescue-earthquake',
+    pinned: true,
+    turns: [
+      {
+        question: '地震时在室内怎么避险？',
+        sourceIds: ['earthquakeSafety'],
+        reply: '先就地避险，等明显震动停止后再有序疏散。震动时降低重心，躲到附近坚固的桌子下，护住头颈并抓牢桌腿。附近没有遮挡物时，用双臂或软垫护住头颈，避开窗户、玻璃和悬挂物。',
+      },
+      {
+        question: '地震时如果已经在室外怎么办？',
+        sourceIds: ['earthquakeSafety'],
+        reply: '就近到开阔处蹲下，避开高楼外墙、电线杆和广告牌。留意坠落物，安全后再按现场指引行动。',
+      },
+    ],
+  },
+  {
+    id: 'demo-rescue-landslide',
+    turns: [
+      {
+        question: '山体滑坡前有哪些征兆？',
+        sourceIds: ['landslideSafety'],
+        reply: '留意坡面新出现的裂缝和渗水、坡脚落石，以及树木或电线杆突然倾斜等异常。发现迹象时尽快离开危险区域，到安全地点后报告险情。如果坡体已经开始滑动，应尽快向滑动方向的两侧撤离。',
+      },
+    ],
+  },
+  {
+    id: 'demo-rescue-typhoon',
+    turns: [
+      {
+        question: '台风来临前应做哪些准备？',
+        sourceIds: ['typhoonSafety'],
+        reply: '关注当地气象预警和转移通知。大风到来前，收好阳台上的花盆等物品，关紧门窗，备好饮用水、方便食品和手电。台风影响期间减少外出，在室内远离玻璃门窗。如果收到转移通知，按要求及时撤到安全地点。',
+      },
+    ],
+  },
+  {
+    id: 'demo-rescue-supplies',
+    turns: [
+      {
+        question: '家庭应急包应该准备什么？',
+        sourceIds: ['householdSupplies'],
+        reply: '可以按用途准备三类物品。\n\n1. 基本生活：饮用水、便于储存的即食食品。\n2. 照明和联络：手电筒、收音机、备用电池、求救哨。\n3. 急救和卫生：创可贴、纱布、绷带、消毒湿巾和口罩。\n\n把应急包放在容易拿到的地方，定期检查食品的保质期和设备电量。',
+      },
+    ],
+  },
+  {
+    id: 'demo-rescue-shelter',
+    turns: [
+      {
+        question: '转移安置时怎样核对人员？',
+        sourceIds: ['floodRoster', 'shelterHandover'],
+        reply: '用转移名单逐人核对安置点到达登记，并单独确认投亲靠友等其他去向。对还没确认去向的人，记录负责核查的人员和下次反馈时间。需要照护或用药协助的人员，在交接时确认接收人和后续安排。',
+      },
+    ],
+  },
+  {
+    id: 'demo-rescue-review',
+    turns: [
+      {
+        question: '拨打 119 时要说清哪些信息？',
+        sourceIds: ['fireReporting'],
+        reply: '拨打 119 后，先说清具体地址，例如街道、门牌号和楼层。地址不清楚时，提供附近明显的地标。接着说明哪里着火、火势如何、是否有人被困。留下可回拨的电话号码，并按接警员的提示补充情况。',
+      },
+    ],
+  },
+]
+
 const cannedReplies: ChatTurn[] = [
   {
     question: '值班交接需要记录哪些内容？',
@@ -131,14 +216,15 @@ export function defaultAttachmentQuestion(attachments: ChatAttachment[]) {
 }
 
 const demoGuideSources: readonly OfflineChatSourceId[] = ['demoGuide']
-const knownTurns = [...cannedReplies, ...scenarios.flatMap(({ turns }) => turns)]
+const answerableTurns = [...cannedReplies, ...scenarios.flatMap(({ turns }) => turns)]
+const knownTurns = [...answerableTurns, ...legacyScenarios.flatMap(({ turns }) => turns)]
 
 export function answerOfflineQuestion(question: string, attachments: ChatAttachment[] = []): ChatTurn {
   if (attachments.length) {
     const { reply, sourceIds } = attachmentReplies[attachments[0].kind]
     return { question, reply, sourceIds, attachments }
   }
-  return cannedReplies.find((turn) => turn.question === question) ?? {
+  return answerableTurns.find((turn) => turn.question === question) ?? {
     question,
     reply: '这个问题暂时超出了本地知识库的覆盖范围，我没能找到可靠的依据。\n\n你可以换个说法再试一次，或者问我应急预案、业务规范、台账记录等相关问题。',
     sourceIds: demoGuideSources,
@@ -159,4 +245,18 @@ export function getOfflineReplySourceIds(turn: ChatTurn) {
 export function createDemoConversations(): OfflineConversation[] {
   const now = Date.now()
   return scenarios.map((scenario, index) => ({ ...scenario, updatedAt: now - (index + 1) * 60 * 60 * 1000 }))
+}
+
+export function refreshOfflineDemoConversation(conversation: OfflineConversation): OfflineConversation {
+  const previous = legacyScenarios.find(({ id }) => id === conversation.id)
+  if (!previous || conversation.turns.length !== previous.turns.length) return conversation
+
+  // Only replace untouched fixtures. Preserve any conversations the user continued.
+  const matchesPrevious = previous.turns.every(({ question, reply }, index) =>
+    conversation.turns[index].question === question && conversation.turns[index].reply === reply,
+  )
+  if (!matchesPrevious) return conversation
+
+  const updated = scenarios.find(({ id }) => id === conversation.id)
+  return updated ? { ...conversation, turns: updated.turns } : conversation
 }
