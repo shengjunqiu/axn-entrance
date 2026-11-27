@@ -22,6 +22,19 @@
   font-variant-numeric: tabular-nums;
 }
 
+:is(html, body):has(#root > .offline-assistant-page) {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+.offline-assistant-page {
+  position: fixed;
+  inset-inline: 0;
+  top: var(--offline-top, 0px);
+  height: var(--offline-height, 100vh);
+  height: var(--offline-height, 100dvh);
+}
+
 @media (min-width: 1024px) {
   .offline-chat-workspace[data-empty] {
     justify-content: safe center;

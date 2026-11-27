@@ -77,14 +77,20 @@ export function OfflineAssistantPage() {
     const element = page.current
     if (!viewport || !element) return
 
-    function updateHeight() {
-      // Mobile keyboards can shrink only the visual viewport without changing dvh.
-      if (viewport && viewport.scale === 1) element?.style.setProperty('--offline-height', `${viewport.height}px`)
+    const updateViewport = () => {
+      // A mobile keyboard can both shrink and pan the visual viewport.
+      if (viewport.scale !== 1) return
+      element.style.setProperty('--offline-height', `${viewport.height}px`)
+      element.style.setProperty('--offline-top', `${viewport.offsetTop}px`)
     }
 
-    updateHeight()
-    viewport.addEventListener('resize', updateHeight)
-    return () => viewport.removeEventListener('resize', updateHeight)
+    updateViewport()
+    viewport.addEventListener('resize', updateViewport)
+    viewport.addEventListener('scroll', updateViewport)
+    return () => {
+      viewport.removeEventListener('resize', updateViewport)
+      viewport.removeEventListener('scroll', updateViewport)
+    }
   }, [])
 
   useEffect(() => {
@@ -122,7 +128,7 @@ export function OfflineAssistantPage() {
       focusComposerAfterHistory.current = true
       setHistoryOpen(false)
     } else {
-      composer.current?.focus()
+      composer.current?.focus({ preventScroll: true })
     }
   }
 
@@ -176,7 +182,7 @@ export function OfflineAssistantPage() {
   const title = turns?.[0].question ?? '新对话'
 
   return (
-    <main ref={page} className="offline-assistant relative flex h-[var(--offline-height,100dvh)] min-w-0 overflow-hidden bg-background text-foreground antialiased lg:bg-muted">
+    <main ref={page} className="offline-assistant offline-assistant-page flex min-w-0 overflow-clip bg-background text-foreground antialiased lg:bg-muted">
       {loginOpen ? (
         <OfflineLoginView
           onBack={returnToHistory}
@@ -201,7 +207,7 @@ export function OfflineAssistantPage() {
                   if (focusComposerAfterHistory.current) {
                     focusComposerAfterHistory.current = false
                     event.preventDefault()
-                    composer.current?.focus()
+                    composer.current?.focus({ preventScroll: true })
                   }
                 }}
               >

@@ -61,7 +61,7 @@ export function OfflineComposer({ draft, onDraftChange, generating, desktop, com
       onDraftChange(offlineVoicePresets[voiceIndex.current % offlineVoicePresets.length])
       voiceIndex.current += 1
       setListening(false)
-      composerRef.current?.focus()
+      composerRef.current?.focus({ preventScroll: true })
     }, listeningDuration)
     return () => window.clearTimeout(timer)
   }, [listening, onDraftChange, composerRef])
@@ -136,7 +136,7 @@ export function OfflineComposer({ draft, onDraftChange, generating, desktop, com
                   className={offlineMenuItemClass}
                   onSelect={() => {
                     setAttachments((current) => current.some(({ name }) => name === preset.name) ? current : [...current, preset])
-                    window.setTimeout(() => composerRef.current?.focus(), 0)
+                    window.setTimeout(() => composerRef.current?.focus({ preventScroll: true }), 0)
                   }}
                 >
                   <Icon aria-hidden="true" />
